@@ -4,9 +4,9 @@
 # <markdowncell>
 
 # # Antibody Response Pulse
-# https://github.com/alvason/antibody-response-pulse/
+# https://github.com/blab/antibody-response-pulse
 # 
-# ### B-cells evolution --- cross-reactive antibodies responses after influenza virus infection or vaccination
+# ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 
 # <codecell>
 
@@ -29,16 +29,20 @@ AlvaFigSize = (9, 7);
 numberingFig = 0;
 
 numberingFig = numberingFig + 1;
-plt.figure(numberingFig, figsize=(12,3))
+plt.figure(numberingFig, figsize=(12,6))
 plt.axis('off')
-plt.title(r'$ Many-strain \ SIR \ equations (mutation \ only) $',fontsize = AlvaFontSize)
-plt.text(0,2.0/3,r'$ \frac{\partial S_n(t)}{\partial t} = \
-         -\beta S_n(t)I(t) +\mu N -\mu S_n(t)$', fontsize = 1.2*AlvaFontSize)
-plt.text(0,1.0/3,r'$ \frac{\partial I_n(t)}{\partial t} = \
-         +\beta S_n(t)I(t) - \gamma I_n(t) -\mu I_n(t) + m \frac{I_{n-1}(t) - 2I_n(t) + I_{n+1}(t)}{(1)^2}$'
+plt.title(r'$ B-cells \ cross-reactive \ antibody \ response \ equations $',fontsize = AlvaFontSize)
+plt.text(0,5.0/6,r'$ \frac{\partial T_n(t)}{\partial t} = \
+         -\beta T_n(t)V_n(t) - \phi F_{n}(t)T_{n}(t) +\mu R_n(t) $', fontsize = 1.2*AlvaFontSize)
+plt.text(0,4.0/6,r'$ \frac{\partial I_n(t)}{\partial t} = \
+         +\beta T_n(t)I(t) - \gamma I_n(t) - \xi I_{n}(t)F_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0,0.0/3,r'$ \frac{\partial R_n(t)}{\partial t} = \
-         +\gamma I_n(t) - \mu R_n(t) $', fontsize = 1.2*AlvaFontSize)
+plt.text(0,3.0/6,r'$ \frac{\partial R_n(t)}{\partial t} = \
+         +\phi F_{n}(t)T_{n}(t) - \mu R_n(t) $', fontsize = 1.2*AlvaFontSize)
+plt.text(0,2.0/6,r'$ \frac{\partial V_n(t)}{\partial t} = \
+         +\rho I_{n}(t) - c V_n(t) $', fontsize = 1.2*AlvaFontSize)
+plt.text(0,1.0/6,r'$ \frac{\partial F_n(t)}{\partial t} = \
+         +\lambda I_{n}(t) - \eta V_n(t) $', fontsize = 1.2*AlvaFontSize)
 plt.show()
 
 # <codecell>
