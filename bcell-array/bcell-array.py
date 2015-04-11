@@ -158,7 +158,10 @@ gridV = gridOut_array[0]
 gridC = gridOut_array[1]
 gridB = gridOut_array[2]
 gridA = gridOut_array[3]
+
+
 firstT = np.copy(gridT)
+firstV= np.copy(gridV)
 firstA= np.copy(gridA)
 
 numberingFig = numberingFig + 1;
@@ -240,6 +243,7 @@ gridB = gridOut_array[2]
 gridA = gridOut_array[3]
 
 secondT= np.copy(gridT)
+secondV= np.copy(gridV)
 secondA= np.copy(gridA)
 
 numberingFig = numberingFig + 1;
@@ -260,8 +264,11 @@ for i in range(1):
 
 numberingFig = numberingFig + 1;
 plt.figure(numberingFig, figsize = AlvaFigSize)
-plt.plot(firstT, firstA[0], label = r'$ 1st \ A(t) $')
-plt.plot(secondT + 600, secondA[0], label = r'$ 2nd \ A(t)$')
+plt.plot(firstT, firstA[0], label = r'$ 1st \ A(t) $', color = 'green', linewidth = 6.0, alpha = 0.3)
+plt.plot(firstT, firstV[0], label = r'$ 1st \ V(t) $', color = 'red')
+plt.plot(secondT + 600, secondA[0], label = r'$ 2nd \ A(t)$', color = 'green', linewidth = 6.0, alpha = 0.3)
+plt.plot(secondT + 600, secondV[0], label = r'$ 2nd \ V(t)$', color = 'red')
+plt.grid(True)
 plt.title(r'$ Antibody \ (immune \ response \ for \ primary \ and \ secondary \ infections) $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
 plt.ylabel(r'$ Cells/ \mu L $', fontsize = AlvaFontSize);
