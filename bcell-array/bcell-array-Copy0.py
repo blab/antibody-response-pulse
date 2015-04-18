@@ -19,9 +19,6 @@ date:   04/09/2015
 
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-import IPython.display as idisplay
-from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 import alva_machinery as alva
 
@@ -287,6 +284,23 @@ plt.title(r'$ Antibody \ (immune \ response \ for \ primary \ and \ secondary \ 
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
 plt.ylabel(r'$ log_2(Cells/ \mu L) $', fontsize = AlvaFontSize);
 plt.legend(loc = (1,0))
+plt.show()
+
+# <codecell>
+
+minT = float(0); maxT = float(100);
+totalGPoint_T = int(10**4 + 1);
+gridT = np.linspace(minT, maxT, totalGPoint_T);
+spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
+gridT = spacingT[0]
+dt = spacingT[1]
+
+a = 0.2
+c = 1
+plt.figure(figsize = AlvaFigSize)
+plt.plot(gridT, 1 - np.log((1 - np.pi)*(c + gridT)**(-a) + np.pi))
+plt.plot(gridT, 1 - np.log((c + gridT)))
+plt.grid(True)
 plt.show()
 
 # <codecell>

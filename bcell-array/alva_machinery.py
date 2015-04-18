@@ -19,16 +19,11 @@ Home-made machinery for solving partial differential equations
 '''
 import numpy as np
 import matplotlib.pyplot as plt
-import time
-import IPython.display as idisplay
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-
-AlvaFontSize = 23;
-AlvaFigSize = (15, 3);
-numberingFig = 0;
 
 # define RK4 for an array (3, n) of coupled differential equations
 def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, totalGPoint_X, minT_In, maxT_In, totalGPoint_T):
+    global actRateB_memory
+    actRateB_memory = 0.0
     # primary size of pde equations
     outWay = pde_array.shape[0]
     # initialize the whole memory-space for output and input
@@ -59,6 +54,16 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
     # initialize the memory-space for keeping current value
     currentOut_Value = np.zeros([outWay, totalGPoint_X])
     for tn in range(totalGPoint_T - 1):
+        actRateB_memory = 0
+        if tn < totalGPoint_T*(2.0/6):
+            actRateB_memory = 0
+        elif tn > totalGPoint_T*(2.0/6):
+            actRateB_memory = float(0.0001)*24  
+            
+        if tn == totalGPoint_T*3.0/6:
+            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
+        elif tn == totalGPoint_T*4.0/6:
+            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gridOutIn_array[-inWay, 0, tn])
@@ -94,4 +99,22 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
         # end of loop
     return (gridOutIn_array[:-inWay, :]);
+
+# <codecell>
+
+# min-max sorting
+def AlvaMinMax(data):
+    totalDataPoint = np.size(data)
+    minMaxListing = np.zeros(totalDataPoint)   
+    for i in range(totalDataPoint):
+        # searching the minimum in current array
+        jj = 0 
+        minMaxListing[i] = data[jj] # suppose the 1st element [0] of current data-list is the minimum
+        for j in range(totalDataPoint - i):
+            if data[j] < minMaxListing[i]: 
+                minMaxListing[i] = data[j]
+                jj = j # recording the position of selected element
+        # reducing the size of searching zone (removing the minmum from current array)
+        data = np.delete(data, jj)
+    return (minMaxListing)
 
