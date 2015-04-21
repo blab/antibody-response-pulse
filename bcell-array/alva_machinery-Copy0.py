@@ -22,7 +22,7 @@ import matplotlib.pyplot as plt
 
 # define RK4 for an array (3, n) of coupled differential equations
 def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, totalGPoint_X, minT_In, maxT_In, totalGPoint_T):
-    global actRateBg
+    global actRateB_memory
     actRateB_memory = 0.0
     # primary size of pde equations
     outWay = pde_array.shape[0]
@@ -54,15 +54,16 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
     # initialize the memory-space for keeping current value
     currentOut_Value = np.zeros([outWay, totalGPoint_X])
     for tn in range(totalGPoint_T - 1):
-        actRateBg = 1000/10**5
-        if tn > totalGPoint_T*(2.0/6):
-            actRateBg = 1000/10**3
+        actRateB_memory = 0
+        if tn < totalGPoint_T*(1.0/6):
+            actRateB_memory = float(0.001)*24
+        elif tn > totalGPoint_T*(3.0/6):
+            actRateB_memory = float(0.001)*24  
             
-        if tn == int(totalGPoint_T*(2.0/6)):
-            gridOutIn_array[0, 0, tn] = 1.0 # virus infection
-        elif tn == int(totalGPoint_T*(4.0/6)):
-            gridOutIn_array[0, 0, tn] = 1.0 # virus infection   
-            
+        if tn == totalGPoint_T*2.0/6:
+            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
+        elif tn == totalGPoint_T*4.0/6:
+            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gridOutIn_array[-inWay, 0, tn])
