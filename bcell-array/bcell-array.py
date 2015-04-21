@@ -174,13 +174,9 @@ for i in range(1):
     plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
     plt.grid(True)
-    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ first-infection) $', fontsize = AlvaFontSize)
+    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
     plt.ylabel(r'$ unit/ml $', fontsize = AlvaFontSize);
-#    plt.text(maxT, totalV*6.0/6, r'$ V_{max} = %f $'%(totalV), fontsize = AlvaFontSize)
- #   plt.text(maxT, totalV*5.0/6, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
-  #  plt.text(maxT, totalV*4.0/6, r'$ \mu_{vm} = %f $'%(outRateVm), fontsize = AlvaFontSize)
-   # plt.text(maxT, totalV*3.0/6, r'$ \mu_{vg} = %f $'%(outRateVg), fontsize = AlvaFontSize)
     plt.legend(loc = (1,0))
 #    plt.yscale('log')
     plt.show()
