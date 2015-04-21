@@ -199,7 +199,7 @@ for i in range(1):
     plt.grid(True)
     plt.title(r'$ Antibody-Virus \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ Cells/ \mu L $', fontsize = AlvaFontSize);
+    plt.ylabel(r'$ Unit/ mL $', fontsize = AlvaFontSize);
     plt.legend(loc = (1,0))
     plt.ylim([1, 10000])
     plt.yscale('log')

@@ -176,11 +176,33 @@ for i in range(1):
     plt.grid(True)
     plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ first-infection) $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ unit/ml $', fontsize = AlvaFontSize);
-#    plt.text(maxT, totalV*6.0/6, r'$ V_{max} = %f $'%(totalV), fontsize = AlvaFontSize)
- #   plt.text(maxT, totalV*5.0/6, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
-  #  plt.text(maxT, totalV*4.0/6, r'$ \mu_{vm} = %f $'%(outRateVm), fontsize = AlvaFontSize)
-   # plt.text(maxT, totalV*3.0/6, r'$ \mu_{vg} = %f $'%(outRateVg), fontsize = AlvaFontSize)
+    plt.ylabel(r'$ Unit/mL $', fontsize = AlvaFontSize)
+    plt.legend(loc = (1,0))
+#    plt.yscale('log')
+    plt.show()
+
+# <codecell>
+
+numberingFig = numberingFig + 1;
+for i in range(1):
+    plt.figure(numberingFig, figsize = AlvaFigSize)
+    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
+    plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
+    plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i))
+    plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
+             , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
+    plt.grid(True)
+    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ first-infection) $', fontsize = AlvaFontSize)
+    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
+    plt.ylabel(r'$ Unit/mL $', fontsize = AlvaFontSize);
+    plt.text(maxT, maxV*10.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*9.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*8.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*7.0/10, r'$ \phi_{g} = %f $'%(killRateVg), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*6.0/10, r'$ \mu_{b} = %f $'%(inRateB), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*5.0/10, r'$ \xi_{m} = %f $'%(inRateM), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*4.0/10, r'$ \xi_{g} = %f $'%(inRateG), fontsize = AlvaFontSize)
+    plt.text(maxT, maxV*3.0/10, r'$ \mu_{g} = %f $'%(outRateG), fontsize = AlvaFontSize)
     plt.legend(loc = (1,0))
 #    plt.yscale('log')
     plt.show()

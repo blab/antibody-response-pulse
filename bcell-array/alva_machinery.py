@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 # define RK4 for an array (3, n) of coupled differential equations
 def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, totalGPoint_X, minT_In, maxT_In, totalGPoint_T):
     global actRateBg
-    actRateB_memory = 0.0
     # primary size of pde equations
     outWay = pde_array.shape[0]
     # initialize the whole memory-space for output and input
