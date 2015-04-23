@@ -105,9 +105,6 @@ def dGdt_array(VBMGxt = [], *args):
 
 # <codecell>
 
-
-# <codecell>
-
 # setting parameter
 timeUnit = 'day'
 if timeUnit == 'hour':
