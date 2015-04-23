@@ -305,7 +305,7 @@ for i in range(1):
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
     plt.ylabel(r'$ Cells/ \mu L $', fontsize = AlvaFontSize);
     plt.legend(loc = (1,0))
-    plt.ylim([10, 10000])
+    plt.ylim([1, 10000])
     plt.yscale('log')
     plt.show()
 
