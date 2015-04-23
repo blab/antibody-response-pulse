@@ -4,7 +4,7 @@
 # <markdowncell>
 
 # # Infectious Pulse
-# https://github.com/alvason/infectious-pulse/
+# https://github.com/blab/antibody-response-pulse/
 # 
 # ## Homemade machinery for solving partial differential equations
 # ### Runge-kutta algorithm for a array of coupled partial differential equation 
@@ -22,8 +22,7 @@ import matplotlib.pyplot as plt
 
 # define RK4 for an array (3, n) of coupled differential equations
 def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, totalGPoint_X, minT_In, maxT_In, totalGPoint_T):
-    global actRateB_memory
-    actRateB_memory = 0.0
+    global actRateBg
     # primary size of pde equations
     outWay = pde_array.shape[0]
     # initialize the whole memory-space for output and input
@@ -54,16 +53,15 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
     # initialize the memory-space for keeping current value
     currentOut_Value = np.zeros([outWay, totalGPoint_X])
     for tn in range(totalGPoint_T - 1):
-        actRateB_memory = 0
-        if tn < totalGPoint_T*(1.0/6):
-            actRateB_memory = float(0.001)*24
-        elif tn > totalGPoint_T*(3.0/6):
-            actRateB_memory = float(0.001)*24  
+        actRateBg = 1000/10**5
+        if tn > totalGPoint_T*(2.0/6):
+            actRateBg = 1000/10**3
             
-        if tn == totalGPoint_T*2.0/6:
-            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
-        elif tn == totalGPoint_T*4.0/6:
-            gridOutIn_array[3, 0, tn] = 9.0 # virus infection
+        if tn == int(totalGPoint_T*(2.0/6)):
+            gridOutIn_array[0, 0, tn] = 1.0 # virus infection
+        elif tn == int(totalGPoint_T*(4.0/6)):
+            gridOutIn_array[0, 0, tn] = 1.0 # virus infection   
+            
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gridOutIn_array[-inWay, 0, tn])
@@ -98,7 +96,7 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         gridOutIn_array[:-inWay, :, tn] = np.copy(currentOut_Value[:, :])
         gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
         # end of loop
-    return (gridOutIn_array[:-inWay, :]);
+    return (gridOutIn_array[:-inWay, :])
 
 # <codecell>
 

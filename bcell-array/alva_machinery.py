@@ -96,7 +96,7 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         gridOutIn_array[:-inWay, :, tn] = np.copy(currentOut_Value[:, :])
         gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
         # end of loop
-    return (gridOutIn_array[:-inWay, :]);
+    return (gridOutIn_array[:-inWay, :])
 
 # <codecell>
 

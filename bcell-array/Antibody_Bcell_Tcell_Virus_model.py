@@ -4,7 +4,7 @@
 # <markdowncell>
 
 # # Antibody Response Pulse
-# https://github.com/alvason/antibody-response-pulse
+# https://github.com/blab/antibody-response-pulse
 # 
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 import alva_machinery as alva
-
 
 AlvaFontSize = 23;
 AlvaFigSize = (14, 6);
@@ -73,7 +72,7 @@ def dBdt_array(ABCVxt = [], *args):
     dB_dt_array = np.zeros(x_totalPoint)
     # each dCdt with the same equation form
     for xn in range(x_totalPoint):
-        dB_dt_array[xn] = +inOutRateB + (actRateB_naive + alva.actRateB_memory)*V[xn]*C[xn]*B[xn] - inOutRateB*B[xn]
+        dB_dt_array[xn] = +inOutRateB + (actRateB_naive + actRateB_memory)*V[xn]*C[xn]*B[xn] - inOutRateB*B[xn]
     return(dB_dt_array)
 
 def dCdt_array(ABCVxt = [], *args):
@@ -104,6 +103,82 @@ def dVdt_array(ABCVxt = [], *args):
         dV_dt_array[xn] = +inRateV*V[xn]*(1 - V[xn]/totalV) - (outRateVg + outRateVm)*A[xn]*V[xn]
     return(dV_dt_array)
 
+# define RK4 for an array (3, n) of coupled differential equations
+def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, totalGPoint_X, minT_In, maxT_In, totalGPoint_T):
+    global actRateB_memory
+    # primary size of pde equations
+    outWay = pde_array.shape[0]
+    # initialize the whole memory-space for output and input
+    inWay = 1; # one layer is enough for storing "x" and "t" (only two list of variable)
+    # define the first part of array as output memory-space
+    gridOutIn_array = np.zeros([outWay + inWay, totalGPoint_X, totalGPoint_T])
+    # loading starting output values
+    for i in range(outWay):
+        gridOutIn_array[i, :, :] = startingOut_Value[i, :, :]
+    # griding input X value  
+    gridingInput_X = np.linspace(minX_In, maxX_In, num = totalGPoint_X, retstep = True)
+    # loading input values to (define the final array as input memory-space)
+    gridOutIn_array[-inWay, :, 0] = gridingInput_X[0]
+    # step-size (increment of input X)
+    dx = gridingInput_X[1]
+    # griding input T value  
+    gridingInput_T = np.linspace(minT_In, maxT_In, num = totalGPoint_T, retstep = True)
+    # loading input values to (define the final array as input memory-space)
+    gridOutIn_array[-inWay, 0, :] = gridingInput_T[0]
+    # step-size (increment of input T)
+    dt = gridingInput_T[1]
+    # starting
+    # initialize the memory-space for local try-step 
+    dydt1_array = np.zeros([outWay, totalGPoint_X])
+    dydt2_array = np.zeros([outWay, totalGPoint_X])
+    dydt3_array = np.zeros([outWay, totalGPoint_X])
+    dydt4_array = np.zeros([outWay, totalGPoint_X])
+    # initialize the memory-space for keeping current value
+    currentOut_Value = np.zeros([outWay, totalGPoint_X])
+    for tn in range(totalGPoint_T - 1):
+        actRateB_memory = 0
+        if tn > totalGPoint_T*(1.0/6):
+            actRateB_memory = float(0.01)*24     
+        if tn == int(totalGPoint_T*2.0/6):
+            gridOutIn_array[3, 0, tn] = 1.0 # virus infection
+        elif tn == int(totalGPoint_T*4.0/6):
+            gridOutIn_array[3, 0, tn] = 1.0 # virus infection
+        # keep initial value at the moment of tn
+        currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
+        currentIn_T_Value = np.copy(gridOutIn_array[-inWay, 0, tn])
+        # first try-step
+        for i in range(outWay):
+            for xn in range(totalGPoint_X):
+                dydt1_array[i, xn] = pde_array[i](gridOutIn_array[:, :, tn])[xn] # computing ratio   
+        gridOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt1_array[:, :]*dt/2 # update output
+        gridOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt/2 # update input
+        # second half try-step
+        for i in range(outWay):
+            for xn in range(totalGPoint_X):
+                dydt2_array[i, xn] = pde_array[i](gridOutIn_array[:, :, tn])[xn] # computing ratio   
+        gridOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt2_array[:, :]*dt/2 # update output
+        gridOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt/2 # update input
+        # third half try-step
+        for i in range(outWay):
+            for xn in range(totalGPoint_X):
+                dydt3_array[i, xn] = pde_array[i](gridOutIn_array[:, :, tn])[xn] # computing ratio   
+        gridOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt3_array[:, :]*dt # update output
+        gridOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt # update input
+        # fourth try-step
+        for i in range(outWay):
+            for xn in range(totalGPoint_X):
+                dydt4_array[i, xn] = pde_array[i](gridOutIn_array[:, :, tn])[xn] # computing ratio 
+        # solid step (update the next output) by accumulate all the try-steps with proper adjustment
+        gridOutIn_array[:-inWay, :, tn + 1] = currentOut_Value[:, :] + dt*(dydt1_array[:, :]/6 
+                                                                                      + dydt2_array[:, :]/3 
+                                                                                      + dydt3_array[:, :]/3 
+                                                                                      + dydt4_array[:, :]/6)
+        # restore to initial value
+        gridOutIn_array[:-inWay, :, tn] = np.copy(currentOut_Value[:, :])
+        gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
+        # end of loop
+    return (gridOutIn_array[:-inWay, :])
+
 # <codecell>
 
 # setting parameter
@@ -133,7 +208,7 @@ outRateVg = float(6.68*10**(-4))/hour # virion clearance rate by IgG
 
 
 # time boundary and griding condition
-minT = float(0); maxT = float(60*day);
+minT = float(0); maxT = float(90*day);
 totalGPoint_T = int(2*10**4 + 1);
 gridT = np.linspace(minT, maxT, totalGPoint_T);
 spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
@@ -162,7 +237,7 @@ gridV_array[0, 0] = float(totalV)/10**3
 # Runge Kutta numerical solution
 pde_array = np.array([dAdt_array, dBdt_array, dCdt_array, dVdt_array])
 startingOut_Value = np.array([gridA_array, gridB_array, gridC_array, gridV_array])
-gridOut_array = alva.AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX, maxX, totalGPoint_X, minT, maxT, totalGPoint_T)
+gridOut_array = AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX, maxX, totalGPoint_X, minT, maxT, totalGPoint_T)
 
 # plotting
 gridA = gridOut_array[0]  
