@@ -23,11 +23,11 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 import alva_machinery as alva
 
-AlvaFontSize = 23;
-AlvaFigSize = (14, 6);
-numberingFig = 0;
+AlvaFontSize = 23
+AlvaFigSize = (14, 6)
+numberingFig = 0
 
-numberingFig = numberingFig + 1;
+numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
 plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ repeated-infection) $'
