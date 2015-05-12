@@ -111,28 +111,28 @@ elif timeUnit == 'day':
     hour = float(1)/24 
     
 maxV = float(1000) # max virus/milli-liter
-inRateV = 6.5*maxV/10**4 # in-rate of virus
+inRateV = 1*maxV/10**3 # in-rate of virus
 killRateVm = 1*maxV/10**5 # kill-rate of virus by antibody-IgM
-killRateVg = killRateVm/1 # kill-rate of virus by antibody-IgG
+killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 3*maxV/10**4 # in-rate of B-cell
+inRateB = 1*maxV/10**5.5 # in-rate of B-cell
 outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 #actRateBg = killRateVg # activation rate of memory B-cell
 
 
-inRateM = maxV/10**2  # in-rate of antibody-IgM from naive B-cell
+inRateM = maxV/10**3  # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/100 # out-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/100 # in-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/10 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(300*day)
-totalPoint_T = int(1*10**4 + 1)
+maxT = float(2*30*day)
+totalPoint_T = int(2*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -156,7 +156,7 @@ gB_array[0, 0] = float(0)
 gM_array[0, 0] = float(0)
 gG_array[0, 0] = float(0)
 
-event_tn_In = np.array([[0, 1000/10**5], [50, 1000/10**3]])
+event_tn_In = np.array([[0, 1000/10**5], [28, 1000/10**3]])
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
 initial_Out = np.array([gV_array, gB_array, gM_array, gG_array])
@@ -168,26 +168,7 @@ gM = gOut_array[2]
 gG = gOut_array[3]
 
 numberingFig = numberingFig + 1
-for i in range(1):
-    plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
-    plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
-    plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i))
-    plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
-             , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.grid(True)
-    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
-    plt.ylabel(r'$ unit/ml $', fontsize = AlvaFontSize)
-    plt.legend(loc = (1,0))
-#    plt.yscale('log')
-    plt.show()
-
-# <codecell>
-
-
-numberingFig = numberingFig + 1
-for i in range(1):
+for i in range(2):
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
     plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
@@ -195,15 +176,20 @@ for i in range(1):
     plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
     plt.grid(True, which = 'both')
-    plt.title(r'$ Antibody-Virus \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
+    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
-    plt.ylabel(r'$ Unit/ mL $', fontsize = AlvaFontSize)
+    plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
+    plt.xlim([minT, maxT])
+    plt.xticks(fontsize = AlvaFontSize*0.6)
+    plt.yticks(fontsize = AlvaFontSize*0.6) 
+    plt.ylim([2**0, 2**14])
+    plt.yscale('log', basey = 2)
     plt.legend(loc = (1,0))
-    plt.ylim([1, 10000])
-    plt.yscale('log')
     plt.show()
 
+# <codecell>
 
+totalPoint_T/2
 
 # <codecell>
 
