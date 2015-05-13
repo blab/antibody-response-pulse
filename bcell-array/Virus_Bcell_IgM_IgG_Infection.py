@@ -24,7 +24,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import alva_machinery_event as alva
 
 AlvaFontSize = 23
-AlvaFigSize = (14, 6)
+AlvaFigSize = (15, 5)
 numberingFig = 0
 
 numberingFig = numberingFig + 1
@@ -42,7 +42,8 @@ plt.text(0, 3.0/8,r'$ \frac{\partial M_n(t)}{\partial t} = \
          +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 1.0/8,r'$ \frac{\partial G_n(t)}{\partial t} = \
-         +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t) $'
+         +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t) \
+         + m \frac{G_{i-1}(t) - 2G_i(t) + G_{i+1}(t)}{(\Delta i)^2} $'
          , fontsize = 1.2*AlvaFontSize)
 plt.show()
 
@@ -96,7 +97,15 @@ def dGdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dG_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dG_dt_array[:] = +inRateG*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:]
+        # each dIdt with the same equation form
+    Gcopy = np.copy(G)
+    centerX = Gcopy[:]
+    leftX = np.roll(Gcopy[:], 1)
+    rightX = np.roll(Gcopy[:], -1)
+    leftX[0] =centerX[0]
+    rightX[-1] = centerX[-1]
+    dG_dt_array[:] = +inRateG*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:] \
+                     + mutatRate*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dG_dt_array)
 
 # <codecell>
@@ -111,27 +120,27 @@ elif timeUnit == 'day':
     hour = float(1)/24 
     
 maxV = float(1000) # max virus/milli-liter
-inRateV = 1*maxV/10**3 # in-rate of virus
+inRateV = 6.5*maxV/10**4 # in-rate of virus
 killRateVm = 1*maxV/10**5 # kill-rate of virus by antibody-IgM
-killRateVg = killRateVm # kill-rate of virus by antibody-IgG
+killRateVg = killRateVm/1 # kill-rate of virus by antibody-IgG
 
-inRateB = 1*maxV/10**5.5 # in-rate of B-cell
+inRateB = 3*maxV/10**4 # in-rate of B-cell
 outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 #actRateBg = killRateVg # activation rate of memory B-cell
 
 
-inRateM = maxV/10**3  # in-rate of antibody-IgM from naive B-cell
+inRateM = maxV/10**2  # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/100 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/10 # out-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/100 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
-
+mutatRate = float(5)/10**2 # mutation rate
 # time boundary and griding condition
 minT = float(0)
-maxT = float(2*30*day)
+maxT = float(2*28*day)
 totalPoint_T = int(2*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
@@ -140,9 +149,9 @@ dt = spacingT[1]
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(1)
-totalPoint_X = int(1 + 1)
-gX = np.linspace(minX, maxX, totalPoint_X);
+maxX = float(3)
+totalPoint_X = int(maxX - minX + 1)
+gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
 gX = gridingX[0]
 dx = gridingX[1]
@@ -151,12 +160,12 @@ gB_array = np.zeros([totalPoint_X, totalPoint_T])
 gM_array = np.zeros([totalPoint_X, totalPoint_T])
 gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
-gV_array[0, 0] = float(1)
-gB_array[0, 0] = float(0)
+gV_array[1, 0] = float(1)
+gB_array[:, 0] = float(0)
 gM_array[0, 0] = float(0)
 gG_array[0, 0] = float(0)
 
-event_tn_In = np.array([[0, 1000/10**5], [28, 1000/10**3]])
+event_tn_In = np.array([[0, 1000/10**5], [14, 1000/10**3]])
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
 initial_Out = np.array([gV_array, gB_array, gM_array, gG_array])
@@ -168,7 +177,7 @@ gM = gOut_array[2]
 gG = gOut_array[3]
 
 numberingFig = numberingFig + 1
-for i in range(2):
+for i in range(totalPoint_X):
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
     plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
@@ -184,12 +193,8 @@ for i in range(2):
     plt.yticks(fontsize = AlvaFontSize*0.6) 
     plt.ylim([2**0, 2**14])
     plt.yscale('log', basey = 2)
-    plt.legend(loc = (1,0))
+    plt.legend(loc = (1,0), fontsize = AlvaFontSize)
     plt.show()
-
-# <codecell>
-
-totalPoint_T/2
 
 # <codecell>
 

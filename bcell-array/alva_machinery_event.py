@@ -57,7 +57,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
             eventName = event_tn_In[1, 1]
         
         if tn == int(totalPoint_T*(1.0/2)):
-            gOutIn_array[0, 0, tn] = 1.0 # virus infection    
+            gOutIn_array[0, 2, tn] = 10.0 # 2nd virus infection    
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])
