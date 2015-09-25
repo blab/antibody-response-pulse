@@ -190,6 +190,7 @@ event_tn_In = np.array([[0, 1/10**2], [14, 1/1]])
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
 initial_Out = np.array([gV_array, gB_array, gM_array, gG_array])
 gOut_array = alva.AlvaRungeKutta4XT(pde_array, initial_Out, minX, maxX, totalPoint_X, minT, maxT, totalPoint_T, event_tn_In)
+
 # plotting
 gV = gOut_array[0]  
 gB = gOut_array[1] 
@@ -198,6 +199,9 @@ gG = gOut_array[3]
 
 numberingFig = numberingFig + 1
 for i in range(totalPoint_X):
+    figure_name = '-response-%i'%(i)
+    figure_suffix = '.png'
+    save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
     plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
@@ -205,7 +209,7 @@ for i in range(totalPoint_X):
     plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
     plt.grid(True, which = 'both')
-    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
+    plt.title(r'$ Antibody \ from \ Virus-{%i} $'%(i), fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
     plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
     plt.xlim([minT, maxT])
@@ -214,5 +218,6 @@ for i in range(totalPoint_X):
     plt.ylim([2**0, 2**14])
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1,0), fontsize = AlvaFontSize)
+    plt.savefig(save_figure, dpi = 100)
     plt.show()
 
