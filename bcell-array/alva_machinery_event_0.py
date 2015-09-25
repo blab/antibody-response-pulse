@@ -52,12 +52,19 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
     # initialize the memory-space for keeping current value
     currentOut_Value = np.zeros([outWay, totalPoint_X])
     for tn in range(totalPoint_T - 1):
+        # secondary period
         eventName = event_tn_In[0, 1] 
         if tn > int(totalPoint_T*(event_tn_In[1, 0]/(maxT_In - minT_In))):
             eventName = event_tn_In[1, 1]
-        
-        if tn == int(totalPoint_T*(1.0/2)):
-            gOutIn_array[0, 2, tn] = 10.0 # 2nd virus infection    
+#            eventName = (1.0/10)*(101 + np.tanh(-maxT_In/4 + gridingInput_T[0])*101)[tn]
+        # timepoint of 2nd virus infection
+        if tn == int(totalPoint_T*(1.0/4)):
+            gOutIn_array[0, 1, tn] = 1.0 # set which virus infection 
+        # timepoint of 3rd virus infection
+        if tn == int(totalPoint_T*(2.0/4)):
+            gOutIn_array[0, 2, tn] = 1.0 # set which virus infection 
+        if tn == int(totalPoint_T*(3.0/4)):
+            gOutIn_array[0, 3, tn] = 1.0 # set which virus infection             
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])

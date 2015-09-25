@@ -131,7 +131,7 @@ consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(300*day)
+maxT = float(6*28*day)
 totalPoint_T = int(1*10**4 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
