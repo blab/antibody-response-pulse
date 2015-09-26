@@ -2,7 +2,7 @@
 Model of cross-reactive antibody response from B cells after influenza virus infection or vaccination
 
 ### [antibody landscape --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/Virus_Bcell_IgM_IgG_Infection.ipynb)
-![alt tag](/figure/Virus-Bcell-Antibody-antibody-landscape.png)
+![](/figure/Virus-Bcell-Antibody-antibody-landscape.png)
 
 ### [antibody response for repeated infections --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/Virus_Bcell_IgM_IgG_model.ipynb)
 ![alt tag](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/figure/antibody-response-repeated-infection.png)
