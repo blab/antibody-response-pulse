@@ -230,7 +230,7 @@ for i in range(totalPoint_X):
 test_time = int(totalPoint_T*(2.0/10)) + totalPoint_T*16*day/(maxT - minT)
 
 # plotting
-figure_name = '-antibody-landscape'
+figure_name = '-landscape'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
