@@ -163,7 +163,7 @@ mutatRate = float(1)/60/day # mutation rate
 # time boundary and griding condition
 minT = float(0)
 maxT = float(2*28*day)
-totalPoint_T = int(2*10**3 + 1)
+totalPoint_T = int(3*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -231,11 +231,11 @@ figure_name = '-Original-Antigenic-Sin'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize = (6, 6))
+figure = plt.figure(numberingFig, figsize = (6, 6))
 plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'black', linestyle = 'dashed'
-         , label = r'$ 1st-virus \ (PR8) $')
+         , label = r'$ Origin-virus $')
 plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'black'
-         , label = r'$ 2nd-virus \ (FM1) $')
+         , label = r'$ Subsequence-virus $')
 plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
@@ -245,8 +245,9 @@ plt.xticks(fontsize = AlvaFontSize*0.6)
 plt.yticks(fontsize = AlvaFontSize*0.6) 
 plt.ylim([2**5, 2**11])
 plt.yscale('log', basey = 2)
-plt.legend(loc = (1,0), fontsize = AlvaFontSize)
-plt.savefig(save_figure, dpi = 100)
+plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
+figure.tight_layout()
+plt.savefig(save_figure, dpi = 100, bbox_inches='tight')#, bbox_extra_artist=[lgd])
 plt.show()
 
 # <codecell>
