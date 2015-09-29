@@ -21,7 +21,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 
-import alva_machinery_event_0 as alva
+import alva_machinery_event_OAS as alva
 
 AlvaFontSize = 23
 AlvaFigSize = (15, 5)
@@ -117,12 +117,11 @@ def dGdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dG_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-        # each dIdt with the same equation form
     Gcopy = np.copy(G)
     centerX = Gcopy[:]
     leftX = np.roll(Gcopy[:], 1)
     rightX = np.roll(Gcopy[:], -1)
-    leftX[0] =centerX[0]
+    leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
     dG_dt_array[:] = +inRateG*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:] \
                      + mutatRate*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
@@ -138,29 +137,33 @@ if timeUnit == 'hour':
 elif timeUnit == 'day':
     day = float(1)
     hour = float(1)/24 
+elif timeUnit == 'year':
+    year = float(1)
+    day = float(1)/365
+    hour = float(1)/24/365 
     
 maxV = float(1000) # max virus/milli-liter
-inRateV = 6.5*maxV/10**4 # in-rate of virus
-killRateVm = 1*maxV/10**5 # kill-rate of virus by antibody-IgM
+inRateV = 6.5*maxV/10**4/day # in-rate of virus
+killRateVm = 1*maxV/10**5/day # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 3*maxV/10**4 # in-rate of B-cell
+inRateB = 3*maxV/10**4/day # in-rate of B-cell
 outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 #actRateBg = float(1)/10**2 # activation rate of memory B-cell
 
-inRateM = maxV/10**2  # in-rate of antibody-IgM from naive B-cell
+inRateM = maxV/10**2/day  # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/100 # out-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/20 # in-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/600 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
-mutatRate = float(1)/10**1 # mutation rate
+mutatRate = float(1)/60/day # mutation rate
 # time boundary and griding condition
 minT = float(0)
-maxT = float(8*28*day)
-totalPoint_T = int(6*10**3 + 1)
+maxT = float(2*28*day)
+totalPoint_T = int(2*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -168,7 +171,7 @@ dt = spacingT[1]
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(5)
+maxX = float(3)
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
@@ -179,12 +182,12 @@ gB_array = np.zeros([totalPoint_X, totalPoint_T])
 gM_array = np.zeros([totalPoint_X, totalPoint_T])
 gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
-gV_array[1, 0] = float(1)
+gV_array[1, 0] = float(1) # set the first infection with one Virus-1
 gB_array[:, 0] = float(0)
 gM_array[0, 0] = float(0)
 gG_array[0, 0] = float(0)
 
-event_tn_In = np.array([[0, 1/10**2], [14, 1/1]])
+event_tn_In = np.array([[0*day, 1/10**2/day], [14*day, 1/1/day]])
 
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
@@ -215,9 +218,50 @@ for i in range(totalPoint_X):
     plt.xlim([minT, maxT])
     plt.xticks(fontsize = AlvaFontSize*0.6)
     plt.yticks(fontsize = AlvaFontSize*0.6) 
-    plt.ylim([2**0, 2**14])
+    plt.ylim([2**0, 2**11])
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1,0), fontsize = AlvaFontSize)
     plt.savefig(save_figure, dpi = 100)
     plt.show()
+
+# <codecell>
+
+# Sequential immunization graph
+figure_name = '-Original-Antigenic-Sin'
+figure_suffix = '.png'
+save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
+numberingFig = numberingFig + 1
+plt.figure(numberingFig, figsize = (6, 6))
+plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'black', linestyle = 'dashed'
+         , label = r'$ 1st-virus \ (PR8) $')
+plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'black'
+         , label = r'$ 2nd-virus \ (FM1) $')
+plt.grid(True, which = 'both')
+plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
+plt.xlim([28, maxT])
+plt.xticks(fontsize = AlvaFontSize*0.6)
+plt.yticks(fontsize = AlvaFontSize*0.6) 
+plt.ylim([2**5, 2**11])
+plt.yscale('log', basey = 2)
+plt.legend(loc = (1,0), fontsize = AlvaFontSize)
+plt.savefig(save_figure, dpi = 100)
+plt.show()
+
+# <codecell>
+
+# Normalization stacked graph
+numberingFig = numberingFig + 1
+plt.figure(numberingFig, figsize = AlvaFigSize)
+plt.stackplot(gT, gM + gG, alpha = 0.3)
+plt.title(r'$ Stacked-graph \ of \ Antibody $', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
+plt.ylim([2**0, 2**12])
+plt.yscale('log', basey = 2)
+plt.show()
+
+# <codecell>
+
 

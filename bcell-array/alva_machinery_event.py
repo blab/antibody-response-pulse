@@ -73,7 +73,19 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
             gOutIn_array[0, 3, tn] = 1.0 # set which virus infection 
         # setting virus = 0 if virus < 1
         if gOutIn_array[0, 3, tn] < 1.0:
-            gOutIn_array[0, 3, tn] = 0.0       
+            gOutIn_array[0, 3, tn] = 0.0    
+        ### timepoint of 5th virus infection
+        if tn == int(totalPoint_T*(4.0/10)):
+            gOutIn_array[0, 4, tn] = 1.0 # set which virus infection 
+        # setting virus = 0 if virus < 1
+        if gOutIn_array[0, 4, tn] < 1.0:
+            gOutIn_array[0, 4, tn] = 0.0  
+        ###### timepoint of 6th virus infection 
+        if tn == int(totalPoint_T*(6.0/10)):
+            gOutIn_array[0, 5, tn] = 1.0 # set which virus infection 
+        # setting virus = 0 if virus < 1
+        if gOutIn_array[0, 5, tn] < 1.0:
+            gOutIn_array[0, 5, tn] = 0.0  
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])

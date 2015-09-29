@@ -160,11 +160,11 @@ consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/100 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
-mutatRate = float(1)/10**1/day # mutation rate
+mutatRate = float(1)/1**1/day # mutation rate
 # time boundary and griding condition
 minT = float(0)
-maxT = float(120*28*day)
-totalPoint_T = int(5*10**4 + 1)
+maxT = float(24*28*day)
+totalPoint_T = int(1*10**4 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -172,7 +172,7 @@ dt = spacingT[1]
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(5)
+maxX = float(9)
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
@@ -227,16 +227,36 @@ for i in range(totalPoint_X):
 
 # <codecell>
 
-test_time = int(totalPoint_T*(2.0/10)) + totalPoint_T*16*day/(maxT - minT)
+# Normalization stacked graph
+numberingFig = numberingFig + 1
+plt.figure(numberingFig, figsize = AlvaFigSize)
+plt.stackplot(gT, gM + gG, alpha = 0.3)
+plt.title(r'$ Stacked-graph \ of \ Antibody $', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
+plt.ylim([2**0, 2**12])
+plt.yscale('log', basey = 2)
+plt.show()
+
+# <codecell>
+
+# expected peak of the antibody response
 
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
+numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = AlvaFigSize)
-plt.plot(gX, gM[:, test_time] + gG[:, test_time], marker = 'o', markersize = 20, color = 'red', alpha = 0.6)
-plt.fill_between(gX, gM[:, test_time] + gG[:, test_time], color = 'green', alpha=0.3)
+detect_time = int(totalPoint_T*(4.0/10)) + totalPoint_T*16*day/(maxT - minT)
+plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'green', alpha = 0.6
+         , label = r'$ pre-existing $')
+plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'green', alpha=0.3)
+detect_time = int(totalPoint_T*(5.0/10)) + totalPoint_T*16*day/(maxT - minT)
+plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'red', alpha = 0.6
+         , label = r'$ current-generating $')
+plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'red', alpha=0.3)
 plt.grid(True, which = 'both')
 plt.title(r'$ Antibody \ Landscape $', fontsize = AlvaFontSize)
 plt.xlabel(r'$ Virus \ space \ (Antigenic-distance) $', fontsize = AlvaFontSize)
