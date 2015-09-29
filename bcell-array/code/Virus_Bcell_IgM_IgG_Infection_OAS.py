@@ -226,16 +226,24 @@ for i in range(totalPoint_X):
 
 # <codecell>
 
+# Experimental lab data from OAS paper
+gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28])
+gPR8_lab = np.array([128 + 64, 512, 512 + 128, 512 - 64]) 
+gFM1_lab = np.array([64 + 16, 128 - 16, 128 + 32, 256 - 32])
 # Sequential immunization graph
 figure_name = '-Original-Antigenic-Sin'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 figure = plt.figure(numberingFig, figsize = (6, 6))
-plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'black', linestyle = 'dashed'
+plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'black', linestyle = 'dotted'
          , label = r'$ Origin-virus $')
 plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'black'
          , label = r'$ Subsequence-virus $')
+plt.plot(gT_lab, gPR8_lab, marker = 'o', markersize = 20, color = 'gray', alpha = 0.6
+         , label = r'$ PR8-virus $')
+plt.plot(gT_lab, gFM1_lab, marker = 's', markersize = 20, color = 'black', alpha = 0.6
+         , label = r'$ FM1-virus $')
 plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)

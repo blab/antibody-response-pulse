@@ -249,11 +249,11 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = AlvaFigSize)
-detect_time = int(totalPoint_T*(4.0/10)) + totalPoint_T*16*day/(maxT - minT)
+detect_time = int(totalPoint_T*(3.0/10)) + totalPoint_T*16*day/(maxT - minT)
 plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'green', alpha = 0.6
          , label = r'$ pre-existing $')
 plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'green', alpha=0.3)
-detect_time = int(totalPoint_T*(5.0/10)) + totalPoint_T*16*day/(maxT - minT)
+detect_time = int(totalPoint_T*(4.0/10)) + totalPoint_T*16*day/(maxT - minT)
 plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'red', alpha = 0.6
          , label = r'$ current-generating $')
 plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'red', alpha=0.3)
