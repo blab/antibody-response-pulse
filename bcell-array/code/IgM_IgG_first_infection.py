@@ -19,13 +19,20 @@ date:   04/09/2015
 
 import numpy as np
 import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d.axes3d import Axes3D
+import os
 
 import alva_machinery as alva
 
 AlvaFontSize = 23
-AlvaFigSize = (14, 6)
+AlvaFigSize = (9, 6)
 numberingFig = 0
+
+# plotting
+dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/bcell-array/figure'
+file_name = 'Virus-Bcell-IgM-IgG'
+figure_name = '-equation'
+file_suffix = '.png'
+save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize=(12, 5))
@@ -173,6 +180,11 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
 
 # <codecell>
 
+# Experimental lab data from OAS paper
+gT_lab = np.array([0, 5, 10, 20, 25, 30, 60, 80])
+gIgG_lab = np.array([0, 0, 4, 8, 8.5, 7.5, 5, 4])*10**2 
+gIgM_lab = np.array([0, 0.2, 2.5, 0.2, 0.1, 0, 0, 0])*10**2
+
 # setting parameter
 timeUnit = 'day'
 if timeUnit == 'hour':
@@ -185,22 +197,23 @@ inRateV = 6.5*maxV/10**4 # in-rate of virus
 killRateVm = 1*maxV/10**5 # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm/1 # kill-rate of virus by antibody-IgG
 
-inRateB = 3*maxV/10**4 # in-rate of B-cell
+inRateB = 2*maxV/10**4 # in-rate of B-cell
 outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of memory B-cell
 
 
-inRateM = maxV/10**2  # in-rate of antibody-IgM from naive B-cell
+inRateM = maxV*1/10**2  # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/15 # in-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/20 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/600 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
-minT = float(0); maxT = float(80*day);
+minT = float(0)
+maxT = float(80*day)
 totalGPoint_T = int(10**4 + 1)
 gridT = np.linspace(minT, maxT, totalGPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
@@ -208,7 +221,8 @@ gridT = spacingT[0]
 dt = spacingT[1]
 
 # space boundary and griding condition
-minX = float(0); maxX = float(1);
+minX = float(0)
+maxX = float(1)
 totalGPoint_X = int(1 + 1)
 gridX = np.linspace(minX, maxX, totalGPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalGPoint_X, retstep = True)
@@ -233,46 +247,35 @@ gridB = gridOut_array[1]
 gridM = gridOut_array[2]
 gridG = gridOut_array[3]
 
+figure_name = '-first-infection'
+figure_suffix = '.png'
+save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 for i in range(1):
     plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
-    plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
-    plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i))
+    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.grid(True)
-    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ first-infection) $', fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ Unit/mL $', fontsize = AlvaFontSize)
-    plt.legend(loc = (1,0))
-#    plt.yscale('log')
-    plt.show()
-
-# <codecell>
-
-numberingFig = numberingFig + 1
-for i in range(1):
-    plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
-    plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i))
-    plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i))
-    plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
-             , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.grid(True)
-    plt.title(r'$ Virus-IgM-IgG \ (immune \ response \ for \ first-infection) $', fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ Unit/mL $', fontsize = AlvaFontSize);
-    plt.text(maxT, maxV*10.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*9.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*8.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*7.0/10, r'$ \phi_{g} = %f $'%(killRateVg), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*6.0/10, r'$ \mu_{b} = %f $'%(inRateB), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*5.0/10, r'$ \xi_{m} = %f $'%(inRateM), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*4.0/10, r'$ \xi_{g} = %f $'%(inRateG), fontsize = AlvaFontSize)
-    plt.text(maxT, maxV*3.0/10, r'$ \mu_{g} = %f $'%(outRateG), fontsize = AlvaFontSize)
-    plt.legend(loc = (1,0))
-#    plt.yscale('log')
+    plt.plot(gT_lab, gIgG_lab, marker = 'o', markersize = 20, alpha = 0.3, color = 'green', label = r'$ IgG-lab $')
+    plt.plot(gT_lab, gIgM_lab, marker = 's', markersize = 20, alpha = 0.3, color = 'blue', label = r'$ IgM-lab $')
+    plt.grid(True, which = 'both')
+    plt.title(r'$ Antibody \ for \ First-infection $', fontsize = AlvaFontSize)
+    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+    plt.ylabel(r'$ Serum \ antibody \ (pg/mL) $', fontsize = AlvaFontSize)
+    plt.xticks(fontsize = AlvaFontSize*0.6)
+    plt.yticks(fontsize = AlvaFontSize*0.6) 
+    plt.text(maxT*16.0/10, maxV*8.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*7.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*6.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*5.0/10, r'$ \phi_{g} = %f $'%(killRateVg), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*4.0/10, r'$ \mu_{b} = %f $'%(inRateB), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*3.0/10, r'$ \xi_{m} = %f $'%(inRateM), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*2.0/10, r'$ \xi_{g} = %f $'%(inRateG), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, maxV*1.0/10, r'$ \mu_{g} = %f $'%(outRateG), fontsize = AlvaFontSize)
+    plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
+    plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
 # <codecell>

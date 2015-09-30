@@ -228,23 +228,19 @@ for i in range(totalPoint_X):
 
 # Experimental lab data from OAS paper
 gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28])
-gPR8_lab = np.array([128 + 64, 512, 512 + 128, 512 - 64]) 
-gFM1_lab = np.array([64 + 16, 128 - 16, 128 + 32, 256 - 32])
+gPR8_lab = np.array([2**(7 + 1.0/2), 2**9, 2**(9 + 1.0/3), 2**(9 - 1.0/4)]) 
+gFM1_lab = np.array([2**(6 + 2.0/5), 2**(7 - 1.0/4), 2**(7 + 1.0/4), 2**(8 - 1.0/4)])
 # Sequential immunization graph
 figure_name = '-Original-Antigenic-Sin'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
-figure = plt.figure(numberingFig, figsize = (6, 6))
-plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'black', linestyle = 'dotted'
+plt.figure(numberingFig, figsize = (6, 6))
+plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'gray'
          , label = r'$ Origin-virus $')
-plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'black'
+plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'red'
          , label = r'$ Subsequence-virus $')
-plt.plot(gT_lab, gPR8_lab, marker = 'o', markersize = 20, color = 'gray', alpha = 0.6
-         , label = r'$ PR8-virus $')
-plt.plot(gT_lab, gFM1_lab, marker = 's', markersize = 20, color = 'black', alpha = 0.6
-         , label = r'$ FM1-virus $')
-plt.grid(True, which = 'both')
+
 plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
@@ -254,8 +250,7 @@ plt.yticks(fontsize = AlvaFontSize*0.6)
 plt.ylim([2**5, 2**11])
 plt.yscale('log', basey = 2)
 plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
-figure.tight_layout()
-plt.savefig(save_figure, dpi = 100, bbox_inches='tight')#, bbox_extra_artist=[lgd])
+plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 # <codecell>
