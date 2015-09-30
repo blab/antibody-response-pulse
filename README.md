@@ -11,7 +11,7 @@ Model of cross-reactive antibody response from B cells after influenza virus inf
 ![](/bcell-array/figure/antibody-response-repeated-infection.png)
 
 ### [antibody response for primary infections --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/IgM_IgG_first_infection.ipynb)
-![](/bcell-array/figure/antibody-response-1st.png)
+![](/bcell-array/figure/Virus-Bcell-IgM-IgG-first-infection.png)
 
 ### [antibody response for repeated infections --- Antibody-Bcell-Tcell-Virus-model model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Antibody_Bcell_Tcell_Virus_model.ipynb)
 ![](/bcell-array/figure/antibody-response-ABTV.png)
