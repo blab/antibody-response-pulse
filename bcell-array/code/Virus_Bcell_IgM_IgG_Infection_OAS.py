@@ -147,7 +147,7 @@ inRateV = 6.5*maxV/10**4/day # in-rate of virus
 killRateVm = 1*maxV/10**5/day # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 3*maxV/10**4/day # in-rate of B-cell
+inRateB = 2*maxV/10**4/day # in-rate of B-cell
 outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 #actRateBg = float(1)/10**2 # activation rate of memory B-cell
@@ -159,7 +159,7 @@ consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 inRateG = inRateM/20 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/600 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = consumeRateM  # consume-rate of antibody-IgG by cleaning virus
-mutatRate = float(1)/60/day # mutation rate
+mutatRate = float(1)/1000/day # mutation rate
 # time boundary and griding condition
 minT = float(0)
 maxT = float(2*28*day)
@@ -187,7 +187,7 @@ gB_array[:, 0] = float(0)
 gM_array[0, 0] = float(0)
 gG_array[0, 0] = float(0)
 
-event_tn_In = np.array([[0*day, 1/10**2/day], [14*day, 1/1/day]])
+event_tn_In = np.array([[0*day, 1/10**2/day], [14*day, 1/100/day]])
 
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
@@ -240,7 +240,11 @@ plt.plot(gT, gM[1] + gG[1], linewidth = 5.0, alpha = 0.5, color = 'gray'
          , label = r'$ Origin-virus $')
 plt.plot(gT, gM[2] + gG[2], linewidth = 5.0, alpha = 0.5, color = 'red'
          , label = r'$ Subsequence-virus $')
-
+plt.plot(gT_lab, gPR8_lab, marker = 'o', markersize = 20, color = 'gray', alpha = 0.6
+         , label = r'$ PR8-virus $')
+plt.plot(gT_lab, gFM1_lab, marker = 's', markersize = 20, color = 'black', alpha = 0.6
+         , label = r'$ FM1-virus $')
+plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)

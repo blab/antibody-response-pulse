@@ -20,17 +20,52 @@ date:   04/09/2015
 import numpy as np
 import matplotlib.pyplot as plt
 
-AlvaFontSize = 23;
-AlvaFigSize = (14, 6);
-numberingFig = 0;
+AlvaFontSize = 23
+AlvaFigSize = (14, 6)
+numberingFig = 0
 
 numberingFig = numberingFig + 1;
 plt.figure(numberingFig, figsize=(12,6))
 plt.axis('off')
-plt.title(r'$ Antibody-Bcell-Tcell-Virus \ response \ equations \ (long-term-infection) $'
+plt.title(r'$ Virus-IgM-IgG-Antibody \ response \ equations $'
           , fontsize = AlvaFontSize)
-plt.text(0, 5.0/6,r'$ \frac{\partial A_n(t)}{\partial t} = \
+plt.text(0, 7.0/9,r'$ \frac{\partial V_n(t)}{\partial t} = \
+         +\rho V_n(t)(1 - \frac{V_n(t)}{V_{max}}) - (\phi_{mv} + \phi_{gv}) A_{n}(t)V_{n}(t) $'
+         , fontsize = 1.2*AlvaFontSize)
+plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} = \
+         +\mu_M + \alpha_M V_n(t)M_{n}(t) - \mu_G G_{n}(t) $'
+         , fontsize = 1.2*AlvaFontSize)
+plt.text(0, 5.0/9,r'$ \frac{\partial G_n(t)}{\partial t} = \
+         +\mu_g + (\alpha_{gn} + \alpha_{bm}) V_{n}(t)N_{n}(t)B_{n}(t) - \mu_b B_n(t) $'
+         , fontsize = 1.2*AlvaFontSize)
+plt.text(0, 1.0/9,r'$ \frac{\partial A_n(t)}{\partial t} = \
          +\mu_a B_{n}(t) - (\phi_{ma} + \phi_{ga})A_{n}(t)V_{n}(t) - (\mu_{ma} + \mu_{ga})A_{n}(t) $'
+         , fontsize = 1.2*AlvaFontSize)
+plt.show()
+
+
+# <codecell>
+
+'''
+author: Alvason Zhenhua Li
+date:   04/09/2015
+'''
+%matplotlib inline
+
+import numpy as np
+import matplotlib.pyplot as plt
+
+AlvaFontSize = 23
+AlvaFigSize = (14, 6)
+numberingFig = 0
+
+numberingFig = numberingFig + 1;
+plt.figure(numberingFig, figsize=(12,6))
+plt.axis('off')
+plt.title(r'$ Virus-Memory-Naive-Antibody \ response \ equations $'
+          , fontsize = AlvaFontSize)
+plt.text(0, 5.0/6,r'$ \frac{\partial V_n(t)}{\partial t} = \
+         +\rho V_n(t)(1 - \frac{V_n(t)}{V_{max}}) - (\phi_{mv} + \phi_{gv}) A_{n}(t)V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 4.0/6,r'$ \frac{\partial B_n(t)}{\partial t} = \
          +\mu_b + (\alpha_{bn} + \alpha_{bm}) V_{n}(t)C_{n}(t)B_{n}(t) - \mu_b B_n(t) $'
@@ -38,8 +73,8 @@ plt.text(0, 4.0/6,r'$ \frac{\partial B_n(t)}{\partial t} = \
 plt.text(0, 3.0/6,r'$ \frac{\partial C_n(t)}{\partial t} = \
          +\mu_c + \alpha_c V_n(t)C_{n}(t) - \mu_c C_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 2.0/6,r'$ \frac{\partial V_n(t)}{\partial t} = \
-         +\rho V_n(t)(1 - \frac{V_n(t)}{V_{max}}) - (\phi_{mv} + \phi_{gv}) A_{n}(t)V_{n}(t) $'
+plt.text(0, 5.0/6,r'$ \frac{\partial A_n(t)}{\partial t} = \
+         +\mu_a B_{n}(t) - (\phi_{ma} + \phi_{ga})A_{n}(t)V_{n}(t) - (\mu_{ma} + \mu_{ga})A_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.show()
 
@@ -194,12 +229,12 @@ elif timeUnit == 'day':
     day = float(1); hour = float(1)/24; 
  
 inRateA = float(0.3)/hour # growth rate of antibody from B-cell (secretion)
-outRateAm = float(0.014)/hour # out rate of Antibody IgM
+outRateAm = float(0.0014)/hour # out rate of Antibody IgM
 outRateAg = float(0.048)/hour # out rate of Antibody IgG
 outRateAmV = float(4.2*10**(-5))/hour # antibody IgM clearance rate by virus
 outRateAgV = float(1.67*10**(-4))/hour # antibody IgG clearance rate by virus
 
-inOutRateB = float(0.037)/hour # birth rate of B-cell
+inOutRateB = float(0.007)/hour # birth rate of B-cell
 actRateB_naive = float(6.0*10**(-7))/hour # activation rate of naive B-cell
 #actRateB_memory = 0*float(0.0012)/hour # activation rate of memory B-cell
 

@@ -195,9 +195,9 @@ elif timeUnit == 'day':
  
 inRateA = float(0.3)/hour # growth rate of antibody from B-cell (secretion)
 outRateAm = float(0.014)/hour # out rate of Antibody IgM
-outRateAg = float(0.048)/hour # out rate of Antibody IgG
+outRateAg = float(0.0048)/hour # out rate of Antibody IgG
 outRateAmV = float(4.2*10**(-5))/hour # antibody IgM clearance rate by virus
-outRateAgV = float(1.67*10**(-4))/hour # antibody IgG clearance rate by virus
+outRateAgV = float(4.2*10**(-5))/hour # antibody IgG clearance rate by virus
 
 inOutRateB = float(0.037)/hour # birth rate of B-cell
 actRateB_naive = float(6.0*10**(-7))/hour # activation rate of naive B-cell
@@ -209,12 +209,12 @@ actRateC = float(7.0*10**(-6))/hour # activation rate of CD4 T-cell
 totalV = float(5000) # total virion/micro-liter
 inRateV = float(0.16)/hour # intrinsic growth rate/hour
 outRateVm = float(1.67*10**(-4))/hour # virion clearance rate by IgM
-outRateVg = float(6.68*10**(-4))/hour # virion clearance rate by IgG
+outRateVg = float(1.67*10**(-4))/hour # virion clearance rate by IgG
 
 
 # time boundary and griding condition
 minT = float(0); maxT = float(80*day);
-totalGPoint_T = int(2*10**4 + 1);
+totalGPoint_T = int(3*10**3 + 1);
 gridT = np.linspace(minT, maxT, totalGPoint_T);
 spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
 gridT = spacingT[0]
@@ -268,6 +268,7 @@ for i in range(1):
     plt.text(maxT, totalV*3.0/6, r'$ \mu_b = %f $'%(inOutRateB), fontsize = AlvaFontSize)
     plt.legend(loc = (1,0))
 #    plt.yscale('log')
+    plt.ylim(-1000,10000)
     plt.show()
 
 # <codecell>
