@@ -20,7 +20,7 @@ Home-made machinery for solving partial differential equations
 import numpy as np
 
 # define RK4 for an array (3, n) of coupled differential equations
-def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, minT_In, maxT_In, totalPoint_T, event_tn_In):
+def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, minT_In, maxT_In, totalPoint_T, event_table):
     global eventName
     # primary size of pde equations
     outWay = pde_array.shape[0]
@@ -52,45 +52,95 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
     # initialize the memory-space for keeping current value
     currentOut_Value = np.zeros([outWay, totalPoint_X])
     for tn in range(totalPoint_T - 1):
-        # secondary period of virus-1
-        eventName = event_tn_In[0, 1] 
-        if tn > int(totalPoint_T*(event_tn_In[1, 0]/(maxT_In - minT_In))):
-            eventName = event_tn_In[1, 1]
-        # setting virus1 = 0 if virus1 < 1
-        if gOutIn_array[0, 1, tn] < 1.0:
-            gOutIn_array[0, 1, tn] = 0.0
-#            eventName = event_tn_In[1, 1]
-        ## timepoint of 1st-infection of virus-2
-        if tn == int(totalPoint_T*(1.0/2)):
-            gOutIn_array[0, 2, tn] = 1.0 # set which virus infection 
-            eventName = event_tn_In[0, 1] 
-        ## setting virus2 = 0 if virus2 < 1
-        if gOutIn_array[0, 2, tn] < 1.0:
-            gOutIn_array[0, 2, tn] = 0.0 
+        event_parameter = event_table[0]
+        event_1st = event_table[1]
+        event_2nd = event_table[2]
+        tn_unit = totalPoint_T/(maxT_In - minT_In)
+        activeTime = event_parameter[2]
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])
         # first try-step
         for i in range(outWay):
             for xn in range(totalPoint_X):
+                ###
+                # cutoff --- set virus = 0 if viral population < 1  
+                if gOutIn_array[0, xn, tn] < 1.0:
+                    gOutIn_array[0, xn, tn] = 0.0 
+                # post-infection --- replace pre-parameter by post-parameter
+                eventName = event_parameter[0]
+                if event_1st[xn, 0] > 1.0 and tn > int((event_1st[xn, 1] + activeTime)*tn_unit):
+                    eventName = event_parameter[1]
+                # 1st-infection --- set viral infection if tn == specific time 
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
+                # 2nd-infection --- set viral infection if tn == specific time 
+                if tn == int(event_2nd[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                ###
                 dydt1_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt1_array[:, :]*dt/2 # update output
         gOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt/2 # update input
         # second half try-step
         for i in range(outWay):
             for xn in range(totalPoint_X):
+                ###
+                # cutoff --- set virus = 0 if viral population < 1  
+                if gOutIn_array[0, xn, tn] < 1.0:
+                    gOutIn_array[0, xn, tn] = 0.0 
+                # post-infection --- replace pre-parameter by post-parameter
+                eventName = event_parameter[0]
+                if event_1st[xn, 0] > 1.0 and tn > int((event_1st[xn, 1] + activeTime)*tn_unit):
+                    eventName = event_parameter[1]
+                # 1st-infection --- set viral infection if tn == specific time 
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
+                # 2nd-infection --- set viral infection if tn == specific time 
+                if tn == int(event_2nd[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                ###
                 dydt2_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt2_array[:, :]*dt/2 # update output
         gOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt/2 # update input
         # third half try-step
         for i in range(outWay):
             for xn in range(totalPoint_X):
+                ###
+                # cutoff --- set virus = 0 if viral population < 1  
+                if gOutIn_array[0, xn, tn] < 1.0:
+                    gOutIn_array[0, xn, tn] = 0.0 
+                # post-infection --- replace pre-parameter by post-parameter
+                eventName = event_parameter[0]
+                if event_1st[xn, 0] > 1.0 and tn > int((event_1st[xn, 1] + activeTime)*tn_unit):
+                    eventName = event_parameter[1]
+                # 1st-infection --- set viral infection if tn == specific time 
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
+                # 2nd-infection --- set viral infection if tn == specific time 
+                if tn == int(event_2nd[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                ###
                 dydt3_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt3_array[:, :]*dt # update output
         gOutIn_array[-inWay, 0, tn] = currentIn_T_Value + dt # update input
         # fourth try-step
         for i in range(outWay):
             for xn in range(totalPoint_X):
+                ###
+                # cutoff --- set virus = 0 if viral population < 1  
+                if gOutIn_array[0, xn, tn] < 1.0:
+                    gOutIn_array[0, xn, tn] = 0.0 
+                # post-infection --- replace pre-parameter by post-parameter
+                eventName = event_parameter[0]
+                if event_1st[xn, 0] > 1.0 and tn > int((event_1st[xn, 1] + activeTime)*tn_unit):
+                    eventName = event_parameter[1]
+                # 1st-infection --- set viral infection if tn == specific time 
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
+                # 2nd-infection --- set viral infection if tn == specific time 
+                if tn == int(event_2nd[xn, 1]*tn_unit):
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                ###
                 dydt4_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio 
         # solid step (update the next output) by accumulate all the try-steps with proper adjustment
         gOutIn_array[:-inWay, :, tn + 1] = currentOut_Value[:, :] + dt*(dydt1_array[:, :]/6 
@@ -99,13 +149,9 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                                                                                       + dydt4_array[:, :]/6)
         # restore to initial value
         gOutIn_array[:-inWay, :, tn] = np.copy(currentOut_Value[:, :])
-        gOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
+        gOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value) 
         # end of loop
     return (gOutIn_array[:-inWay, :])
-
-# <codecell>
-
-#   eventName = (1.0/10)*(101 + np.tanh(-maxT_In/4 + gridingInput_T[0])*101)[tn]
 
 # <codecell>
 

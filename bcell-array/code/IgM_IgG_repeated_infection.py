@@ -81,7 +81,7 @@ def dBdt_array(VBMGxt = [], *args):
     dB_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
     for xn in range(x_totalPoint):
-        dB_dt_array[xn] = +inRateB + (actRateBm + + eName[xn])*B[xn]*V[xn] - outRateB*B[xn]
+        dB_dt_array[xn] = +inRateB*V[xn]*(1 - V[xn]/maxV) + (actRateBm + + eName[xn])*B[xn]*V[xn] - outRateB*B[xn]
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -212,22 +212,22 @@ if timeUnit == 'hour':
 elif timeUnit == 'day':
     day = float(1); hour = float(1)/24; 
     
-maxV = float(64) # max virus/micro-liter
+maxV = float(50) # max virus/micro-liter
 inRateV = 0.2/hour # in-rate of virus
-killRateVm = 0.00025/hour # kill-rate of virus by antibody-IgM
+killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.1/hour # in-rate of B-cell
-outRateB = inRateB/10 # out-rate of B-cell
+inRateB = 0.06/hour # in-rate of B-cell
+outRateB = inRateB/8 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of memory B-cell
 
-inRateM = 0.25/hour # in-rate of antibody-IgM from naive B-cell
-outRateM = inRateM/1.5  # out-rate of antibody-IgM from naive B-cell
+inRateM = 0.16/hour # in-rate of antibody-IgM from naive B-cell
+outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/8 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/150 # out-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
@@ -257,7 +257,7 @@ gridB_array[0, 0] = float(0)
 gridM_array[0, 0] = float(0)
 gridG_array[0, 0] = float(0)
 
-event_tn_In = np.array([[0*day, 0.00025/hour], [14*day, 0.002/hour]])
+event_tn_In = np.array([[0*day, 0.0002/hour], [14*day, 0.002/hour]])
 
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
