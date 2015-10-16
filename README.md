@@ -2,7 +2,7 @@
 Model of cross-reactive antibody response from B cells after influenza virus infection or vaccination
 
 ### [antibody landscape --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Virus_Bcell_IgM_IgG_Infection.ipynb)
-![](/bcell-array/figure/Virus-Bcell-Antibody-landscape.png)
+
 
 ### [original antigenic sin --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Virus_Bcell_IgM_IgG_Infection_OAS.ipynb)
 ![](/bcell-array/figure/Virus-Bcell-IgM-IgG-Original-Antigenic-Sin.png)
