@@ -24,6 +24,14 @@ AlvaFontSize = 23;
 AlvaFigSize = (14, 6);
 numberingFig = 0;
 
+# setting parameter
+timeUnit = 'day'
+if timeUnit == 'hour':
+    hour = float(1); day = float(24); 
+elif timeUnit == 'day':
+    day = float(1); hour = float(1)/24;  
+    
+###############
 numberingFig = numberingFig + 1;
 plt.figure(numberingFig, figsize=(12,6))
 plt.axis('off')
@@ -134,19 +142,20 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
     currentOut_Value = np.zeros([outWay, totalGPoint_X])
     for tn in range(totalGPoint_T - 1):
         actRateB_memory = 0
-        if tn > totalGPoint_T*(1.0/6):
+        tn_unit = totalGPoint_T/(maxT_In - minT_In)
+        if tn > int(14*day*tn_unit):
             actRateB_memory = float(0.01)*24     
         # setting virus1 = 0 if virus1 < 1
         if gridOutIn_array[3, 0, tn] < 1.0:
             gridOutIn_array[3, 0, tn] = 0.0
         ## 2nd infection
-        if tn == int(totalGPoint_T*1.0/4):
+        if tn == int(20*day*tn_unit):
             gridOutIn_array[3, 0, tn] = 1.0 # virus infection
         ### 3rd infection
-        if tn == int(totalGPoint_T*2.0/4):
+        if tn == int(2*20*day*tn_unit):
             gridOutIn_array[3, 0, tn] = 1.0 # virus infection
         ### 4rd infection
-        if tn == int(totalGPoint_T*3.0/4):
+        if tn == int(50*day*tn_unit):
             gridOutIn_array[3, 0, tn] = 1.0 # virus infection
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
@@ -183,16 +192,8 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
         # end of loop
     return (gridOutIn_array[:-inWay, :])
+##############
 
-# <codecell>
-
-# setting parameter
-timeUnit = 'day'
-if timeUnit == 'hour':
-    hour = float(1); day = float(24); 
-elif timeUnit == 'day':
-    day = float(1); hour = float(1)/24; 
- 
 inRateA = float(0.3)/hour # growth rate of antibody from B-cell (secretion)
 outRateAm = float(0.014)/hour # out rate of Antibody IgM
 outRateAg = float(0.048)/hour # out rate of Antibody IgG
@@ -213,8 +214,8 @@ outRateVg = float(6.68*10**(-4))/hour # virion clearance rate by IgG
 
 
 # time boundary and griding condition
-minT = float(0); maxT = float(80*day);
-totalGPoint_T = int(2*10**4 + 1);
+minT = float(0); maxT = float(3*20*day);
+totalGPoint_T = int(1*10**4 + 1);
 gridT = np.linspace(minT, maxT, totalGPoint_T);
 spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
 gridT = spacingT[0]
@@ -269,51 +270,6 @@ for i in range(1):
     plt.legend(loc = (1,0))
 #    plt.yscale('log')
     plt.show()
-
-# <codecell>
-
-# plotting
-gridA = gridOut_array[0]  
-gridB = gridOut_array[1]
-gridC = gridOut_array[2]
-gridV = gridOut_array[3]
-
-
-numberingFig = numberingFig + 1;
-for i in range(1):
-    plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gridT, gridA[i], color = 'green', label = r'$ A_{%i}(t) $'%(i))
-    plt.plot(gridT, gridB[i], color = 'blue', label = r'$ B_{%i}(t) $'%(i))
-    plt.plot(gridT, gridC[i], color = 'gray', label = r'$ C_{%i}(t) $'%(i))
-    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
-    plt.grid(True)
-    plt.title(r'$ Antibody-Bcell-Tcell-Virus \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ Cells/ \mu L $', fontsize = AlvaFontSize);
-    plt.text(maxT, totalV*6.0/6, r'$ \Omega = %f $'%(totalV), fontsize = AlvaFontSize)
-    plt.text(maxT, totalV*5.0/6, r'$ \phi = %f $'%(inRateV), fontsize = AlvaFontSize)
-    plt.text(maxT, totalV*4.0/6, r'$ \xi = %f $'%(inRateA), fontsize = AlvaFontSize)
-    plt.text(maxT, totalV*3.0/6, r'$ \mu_b = %f $'%(inOutRateB), fontsize = AlvaFontSize)
-    plt.legend(loc = (1,0))
-    plt.ylim([2**0, 2**14])
-    plt.yscale('log', basey = 2)
-    plt.show()
-
-numberingFig = numberingFig + 1;
-for i in range(1):
-    plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gridT, gridA[i], color = 'green', label = r'$ A_{%i}(t) $'%(i))
-    plt.plot(gridT, gridB[i], color = 'blue', label = r'$ B_{%i}(t) $'%(i))
-    plt.plot(gridT, gridC[i], color = 'gray', label = r'$ C_{%i}(t) $'%(i))
-    plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i))
-    plt.grid(True)
-    plt.title(r'$ Antibody-Virus \ (immune \ response \ for \ repeated-infection) $', fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize);
-    plt.ylabel(r'$ Cells/ \mu L $', fontsize = AlvaFontSize);
-    plt.legend(loc = (1,0))
-    plt.ylim([-1000, 10000])
-    plt.show()
-
 
 # <codecell>
 

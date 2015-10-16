@@ -81,7 +81,7 @@ def dBdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dB_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV) + (actRateBm + alva.eventName)*V[:]*B[:] - outRateB*B[:]
+    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV) + (actRateBm + alva.event_active)*V[:]*B[:] - outRateB*B[:]
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -113,7 +113,7 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +inRateG*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:] \
+    dG_dt_array[:] = +(inRateG + alva.event_OAS)*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:] \
                      + mutatRate*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dG_dt_array)
 
@@ -150,12 +150,12 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRate = 0.0/hour # mutation rate
+mutatRate = 0.0007/hour # mutation rate
 
 # time boundary and griding condition
 minT = float(0)
 maxT = float(10*28*day)
-totalPoint_T = int(3*10**3 + 1)
+totalPoint_T = int(1*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -176,19 +176,21 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
 #gV_array[1, 0] = float(2)
 
-event_parameter = np.array([0.0002/hour,
+event_parameter = np.array([[0.0002/hour,
                             0.003/hour,
-                            14*day])
+                            14*day,
+                            1.0/hour]])
 # viral population, starting time, first
 event_1st = np.array([[0, 0*day],
-                      [3, 0*28*day], 
-                      [3, 2*28*day],
-                      [3, 2*28*day]]) 
+                      [3, (1 + 0*28)*day], 
+                      [3, (1 + 1*28)*day],
+                      [0, (1 + 2*28)*day]]) 
 # viral population, starting time, 2nd
-event_2nd = np.array([[0, 0*day],
-                      [3, 2*28*day], 
+event_2nd = np.array([[0, 0*28*day],
+                      [0, 0*28*day], 
                       [0, 0*28*day],
                       [0, 0*28*day]]) 
+
 event_table = np.array([event_parameter, event_1st, event_2nd])
 
 # Runge Kutta numerical solution
@@ -220,7 +222,7 @@ for i in range(totalPoint_X):
     plt.xlim([minT, maxT])
     plt.xticks(fontsize = AlvaFontSize*0.6)
     plt.yticks(fontsize = AlvaFontSize*0.6) 
-    plt.ylim([2**0, 2**10.2])
+    plt.ylim([2**0, 2**11])
 #    plt.yscale('log', basey = 2)
     plt.legend(loc = (1,0), fontsize = AlvaFontSize)
     plt.savefig(save_figure, dpi = 100)
@@ -250,7 +252,7 @@ plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin $', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
-plt.xlim([minT, maxT])
+plt.xlim([minT, 2*28*day])
 plt.xticks(fontsize = AlvaFontSize*0.6)
 plt.yticks(fontsize = AlvaFontSize*0.6) 
 plt.ylim([2**5, 2**12])
@@ -274,7 +276,7 @@ plt.show()
 
 # <codecell>
 
-event_space[1]
+event_table[0][0][0]
 
 # <codecell>
 
