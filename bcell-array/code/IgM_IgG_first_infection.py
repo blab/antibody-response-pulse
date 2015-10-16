@@ -265,9 +265,6 @@ for i in range(1):
 
 # <codecell>
 
-figure_name = '-first-infection'
-figure_suffix = '.png'
-save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 ymin = -100
 ymax = 1100
@@ -290,7 +287,6 @@ for i in range(1):
     plt.ylim([2**0, 2**11])
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
-    plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
 # <codecell>
