@@ -4,8 +4,8 @@ Model of cross-reactive antibody response from B cells after influenza virus inf
 ### [antibody landscape --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Virus_Bcell_IgM_IgG_Infection.ipynb)
 
 
-### [original antigenic sin --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Virus_Bcell_IgM_IgG_Infection_OAS.ipynb)
-![](/bcell-array/figure/Virus-Bcell-IgM-IgG-Original-Antigenic-Sin.png)
+### [original antigenic sin from sequential infection --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/Virus_Bcell_IgM_IgG_Infection_OAS_new.ipynb)
+![](/bcell-array/figure/Virus-Bcell-IgM-IgG-Original-Antigenic-Sin-infection.png)
 
 ### [antibody response for repeated infections --- Virus-Bcell-IgM-IgG model](https://github.com/blab/antibody-response-pulse/blob/master/bcell-array/code/IgM_IgG_repeated_infection.ipynb)
 ![](/bcell-array/figure/Virus-Bcell-IgM-IgG-repeated-infection.png)
