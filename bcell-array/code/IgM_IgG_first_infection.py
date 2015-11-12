@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
 
-# <markdowncell>
+# coding: utf-8
 
 # # Antibody Response Pulse
 # https://github.com/blab/antibody-response-pulse/
@@ -9,13 +7,13 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# <codecell>
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
 date:   04/09/2015
 '''
-%matplotlib inline
+get_ipython().magic(u'matplotlib inline')
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -263,7 +261,8 @@ for i in range(1):
     plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
-# <codecell>
+
+# In[2]:
 
 numberingFig = numberingFig + 1
 ymin = -100
@@ -289,6 +288,8 @@ for i in range(1):
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
     plt.show()
 
-# <codecell>
+
+# In[ ]:
+
 
 
