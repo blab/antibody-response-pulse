@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[6]:
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
@@ -227,7 +227,7 @@ gridB = gridOut_array[1]
 gridM = gridOut_array[2]
 gridG = gridOut_array[3]
 
-figure_name = '-first-infection'
+figure_name = '-first-infection-OAS'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
@@ -262,7 +262,7 @@ for i in range(1):
     plt.show()
 
 
-# In[5]:
+# In[2]:
 
 numberingFig = numberingFig + 1
 ymin = -100

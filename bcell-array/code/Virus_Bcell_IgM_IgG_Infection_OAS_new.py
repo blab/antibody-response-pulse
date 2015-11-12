@@ -247,9 +247,9 @@ plt.plot(gT, (gM[1] + gG[1]), linewidth = 5.0, alpha = 0.5, color = 'gray'
          , label = r'$ Origin-virus $')
 plt.plot(gT, (gM[2] + gG[2]), linewidth = 5.0, alpha = 0.5, color = 'red'
          , label = r'$ Subsequence-virus $')
-plt.bar(gT_lab, gPR8_lab, bar_width, alpha = 0.6, color='gray', yerr = standard_PR8
+plt.bar(gT_lab, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', yerr = standard_PR8
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ PR8-virus $')
-plt.bar(gT_lab + bar_width, gFM1_lab, bar_width, alpha = 0.6, color='red', yerr = standard_FM1
+plt.bar(gT_lab + bar_width, gFM1_lab, bar_width, alpha = 0.6, color = 'red', yerr = standard_FM1
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ FM1-virus $')
 plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
