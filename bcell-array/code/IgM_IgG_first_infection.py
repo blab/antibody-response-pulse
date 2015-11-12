@@ -292,7 +292,6 @@ for i in range(1):
     plt.ylim(ymin, ymax)
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
-    plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
 

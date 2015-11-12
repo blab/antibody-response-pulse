@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
 
-# <markdowncell>
+# coding: utf-8
 
 # # Antibody Response Pulse
 # https://github.com/blab/antibody-response-pulse/
@@ -9,13 +7,13 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# <codecell>
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
 date:   04/09/2015
 '''
-%matplotlib inline
+get_ipython().magic(u'matplotlib inline')
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,17 +35,13 @@ plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
 plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ repeated-infection) $'
           , fontsize = AlvaFontSize)
-plt.text(0, 7.0/8, r'$ \frac{\partial V_n(t)}{\partial t} = \
-         +\mu_{v} V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
+plt.text(0, 7.0/8, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v} V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/8, r'$ \frac{\partial B_n(t)}{\partial t} = \
-         +\mu_{b} + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t) $'
+plt.text(0, 5.0/8, r'$ \frac{\partial B_n(t)}{\partial t} =          +\mu_{b} + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/8,r'$ \frac{\partial M_n(t)}{\partial t} = \
-         +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
+plt.text(0, 3.0/8,r'$ \frac{\partial M_n(t)}{\partial t} =          +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/8,r'$ \frac{\partial G_n(t)}{\partial t} = \
-         +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t) $'
+plt.text(0, 1.0/8,r'$ \frac{\partial G_n(t)}{\partial t} =          +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.show()
 
@@ -198,12 +192,16 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         # end of loop
     return (gridOutIn_array[:-inWay, :])
 
-# <codecell>
 
-# Experimental lab data from OAS paper
+# In[2]:
+
+# Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab = np.array([0, 5, 10, 20, 25, 30, 60, 80])
-gIgG_lab = np.array([0, 0, 4, 8, 8.5, 7.5, 5, 4])*10**2 
-gIgM_lab = np.array([0, 0.2, 2.5, 0.2, 0.1, 0, 0, 0])*10**2
+gIgG_lab = np.array([0, 0.5, 4, 8.5, 8.75, 7.5, 5.5, 4])*10**2 
+error_IgG = gIgG_lab**(4.0/5)
+gIgM_lab = np.array([0, 1.0/3, 3, 1.0/3, 1.0/6, 1.0/10, 0, 0])*10**2
+error_IgM = gIgM_lab**(4.0/5)
+bar_width = 4
 
 # setting parameter
 timeUnit = 'day'
@@ -282,8 +280,10 @@ for i in range(1):
     plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.plot(gT_lab, gIgG_lab, marker = 'o', markersize = 20, alpha = 0.3, color = 'green', label = r'$ IgG-(lab-X31) $')
-    plt.plot(gT_lab, gIgM_lab, marker = 's', markersize = 20, alpha = 0.3, color = 'blue', label = r'$ IgM-(lab-X31) $')
+    plt.bar(gT_lab, gIgG_lab, bar_width, alpha = 0.6, color = 'green', yerr = error_IgG
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgG(X31-virus) $')
+    plt.bar(gT_lab - bar_width, gIgM_lab, bar_width, alpha = 0.6, color = 'blue', yerr = error_IgM
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgM(X31-virus) $')
     plt.grid(True, which = 'both')
     plt.title(r'$ Antibody \ for \ repeated-infection $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
@@ -304,6 +304,8 @@ for i in range(1):
     plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
-# <codecell>
+
+# In[ ]:
+
 
 
