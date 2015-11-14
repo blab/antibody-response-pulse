@@ -107,17 +107,11 @@ def dGdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dG_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    Gcopy = np.copy(G)
-    centerX = Gcopy[:]
-    leftX = np.roll(Gcopy[:], 1)
-    rightX = np.roll(Gcopy[:], -1)
-    leftX[0] = centerX[0]
-    rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS)*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:]                      + mutatRate*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dG_dt_array[:] = +(inRateG + alva.event_OAS)*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:]
     return(dG_dt_array)
 
 
-# In[12]:
+# In[2]:
 
 # setting parameter
 timeUnit = 'day'
@@ -150,7 +144,6 @@ outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
 mutatRateB = 0.00002/hour # B-cell mutation rate
-mutatRate = 0.0001/hour # mutation rate
 
 # time boundary and griding condition
 minT = float(0)
@@ -232,7 +225,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[13]:
+# In[9]:
 
 # Experimental lab data from OAS paper
 gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28])
@@ -272,7 +265,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[14]:
+# In[4]:
 
 # Experimental lab data from OAS paper
 gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28])
