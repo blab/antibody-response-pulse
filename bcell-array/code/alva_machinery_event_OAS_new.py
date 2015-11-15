@@ -60,6 +60,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
         event_2nd = event_table[2]
         tn_unit = totalPoint_T/(maxT_In - minT_In)
         activeTime = event_parameter[2]
+        originVirus = event_parameter[5]
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])
@@ -82,11 +83,15 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # 2nd-infection --- set viral infection if tn == specific time 
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                # OAS-infection
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- set viral infection if tn == specific time 
-                if xn == 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
+                if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
                 # OAS-immunity --- set viral infection if tn == specific time 
-                if xn > 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
+                if xn > originVirus and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_B = event_parameter[4] # in-rate of antibody-IgG from memory B-cell
                 ###
                 dydt1_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
@@ -110,12 +115,16 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                     gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
                 # 2nd-infection --- set viral infection if tn == specific time 
                 if tn == int(event_2nd[xn, 1]*tn_unit):
-                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0]
+                # OAS-infection
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- set viral infection if tn == specific time 
-                if xn == 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
+                if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
                 # OAS-immunity --- set viral infection if tn == specific time 
-                if xn > 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
+                if xn > originVirus and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_B = event_parameter[4] # in-rate of antibody-IgG from memory B-cell
                 ###
                 dydt2_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
@@ -140,11 +149,15 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # 2nd-infection --- set viral infection if tn == specific time 
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                # OAS-infection
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- set viral infection if tn == specific time 
-                if xn == 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
+                if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
                 # OAS-immunity --- set viral infection if tn == specific time 
-                if xn > 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
+                if xn > originVirus and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_B = event_parameter[4] # in-rate of antibody-IgG from memory B-cell
                 ###
                 dydt3_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
@@ -168,12 +181,16 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                     gOutIn_array[0, xn, tn] = event_1st[xn, 0] 
                 # 2nd-infection --- set viral infection if tn == specific time 
                 if tn == int(event_2nd[xn, 1]*tn_unit):
-                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
+                    gOutIn_array[0, xn, tn] = event_2nd[xn, 0]
+                # OAS-infection
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- set viral infection if tn == specific time 
-                if xn == 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
+                if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
                 # OAS-immunity --- set viral infection if tn == specific time 
-                if xn > 1 and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
+                if xn > originVirus and event_1st[xn, 0] > 1.0 and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_B = event_parameter[4] # in-rate of antibody-IgG from memory B-cell
                 ###
                 dydt4_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio 
