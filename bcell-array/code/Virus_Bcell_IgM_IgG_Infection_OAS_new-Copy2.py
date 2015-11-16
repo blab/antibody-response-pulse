@@ -18,6 +18,7 @@ get_ipython().magic(u'matplotlib inline')
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from matplotlib.ticker import FuncFormatter
 
 import alva_machinery_event_OAS_new as alva
 
@@ -25,7 +26,7 @@ AlvaFontSize = 23
 AlvaFigSize = (15, 5)
 numberingFig = 0
 
-# equation plotting
+# plotting
 dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/bcell-array/figure'
 file_name = 'Virus-Bcell-IgM-IgG'
 figure_name = '-equation'
@@ -37,7 +38,7 @@ plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
 plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ repeated-infection) $'
           , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v} V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
+plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\mu_{b}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{n}(t)\frac{B_{i-1}(t) - 2B_i(t) + B_{i+1}(t)}{(\Delta i)^2} $'
          , fontsize = 1.2*AlvaFontSize)
@@ -48,6 +49,7 @@ plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          +\xi_{g} B_{
 
 plt.savefig(save_figure, dpi = 100)
 plt.show()
+
 
 # define the V-M-G partial differential equations
 def dVdt_array(VBMGxt = [], *args):
@@ -118,7 +120,7 @@ def dGdt_array(VBMGxt = [], *args):
 # In[2]:
 
 # setting parameter
-timeUnit = 'year'
+timeUnit = 'day'
 if timeUnit == 'hour':
     hour = float(1)
     day = float(24)
@@ -147,13 +149,13 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.00002/hour # B-cell mutation rate
-mutatRateA = 0.0002/hour # mutation rate
+mutatRateB = 0.00003/hour # B-cell mutation rate
+mutatRateA = 0.0001/hour # antibody mutation rate
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(7*12*30*day)
-totalPoint_T = int(4*10**3 + 1)
+maxT = float(6*28*day)
+totalPoint_T = int(1*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -161,7 +163,7 @@ dt = spacingT[1]
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(6)
+maxX = float(3)
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
@@ -173,23 +175,22 @@ gM_array = np.zeros([totalPoint_X, totalPoint_T])
 gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
 #gV_array[1, 0] = float(2)
-#[pre-parameter, post-parameter, recovered-day, OAS+, OSA-, origin_virus]
+#[pre-parameter, post-parameter, recovered-day, OAS+, OSA-]
 actRateBg_1st = 0.0002/hour # activation rate of memory B-cell at 1st time (pre-)
 actRateBg_2nd = actRateBg_1st*10 # activation rate of memory B-cell at 2nd time (post-)
 origin_virus = int(1)
-current_virus = int(4)
 event_parameter = np.array([[actRateBg_1st,
                             actRateBg_2nd,
                             14*day,
                             +5/hour,
-                            -actRateBm - actRateBg_1st + (actRateBm + actRateBg_1st)/1.3,
+                            -actRateBm - actRateBg_1st + (actRateBm + actRateBg_1st)/3,
                             origin_virus]])
-
+# [viral population, starting time, first]
 # [viral population, starting time] ---first
-infection_period = 12*30*day
+infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
-viral_population[origin_virus:current_virus + 1] = 3
-infection_starting_time = np.arange(int(maxX + 1))*infection_period
+viral_population[origin_virus:-1] = 3
+infection_starting_time = np.arange(int(maxX + 1))*infection_period 
 event_1st = np.zeros([int(maxX + 1), 2])
 event_1st[:, 0] = viral_population
 event_1st[:, 1] = infection_starting_time
@@ -197,7 +198,7 @@ print ('event_1st = {:}'.format(event_1st))
 
 # [viral population, starting time] ---2nd]
 viral_population = np.zeros(int(maxX + 1))
-viral_population[origin_virus:current_virus + 1] = 0
+viral_population[origin_virus:-1] = 0
 infection_starting_time = np.arange(int(maxX + 1))*0
 event_2nd = np.zeros([int(maxX + 1), 2])
 event_2nd[:, 0] = viral_population
@@ -244,104 +245,88 @@ for i in range(totalPoint_X):
 
 # In[3]:
 
-# Normalization stacked graph
+# Experimental lab data from OAS paper
+gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) + 28
+gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
+standard_PR8 = gPR8_lab**(3.0/4)
+
+gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
+standard_FM1 = gFM1_lab**(3.0/4)
+bar_width = 2.0
+
+# Sequential immunization graph
+
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize = AlvaFigSize)
-plt.stackplot(gT, gM + gG, alpha = 0.3)
-plt.title(r'$ Stacked-graph \ of \ Antibody $', fontsize = AlvaFontSize)
+plt.figure(numberingFig, figsize = (12, 6))
+plt.subplot(111)
+plt.plot(gT, (gM[origin_virus] + gG[origin_virus]), linewidth = 5.0, alpha = 0.5, color = 'gray'
+         , label = r'$ Origin-virus $')
+plt.plot(gT, (gM[origin_virus + 1] + gG[origin_virus + 1]), linewidth = 5.0, alpha = 0.5, color = 'red'
+         , label = r'$ Subsequence-virus $')
+plt.bar(gT_lab - bar_width/2, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', yerr = standard_PR8
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ PR8-virus $')
+plt.bar(gT_lab + bar_width/2, gFM1_lab, bar_width, alpha = 0.6, color = 'red', yerr = standard_FM1
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ FM1-virus $')
+plt.grid(True, which = 'both')
+plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xticks(fontsize = AlvaFontSize*0.6)
 plt.yticks(fontsize = AlvaFontSize*0.6) 
-#plt.ylim([2**0, 2**14])
-#plt.yscale('log', basey = 2)
+plt.xlim([minT, 6*30*day])
+plt.ylim([2**5, 2**14])
+plt.yscale('log', basey = 2)
+# gca()---GetCurrentAxis and Format the ticklabel to be 2**x
+plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: int(2**(np.log(x)/np.log(2)))))
+#plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
+plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
 # In[4]:
 
-# expected peak of the antibody response
-totalColor = current_virus - origin_virus + 1 
-AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
+# Experimental lab data from OAS paper
+gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) + 28
+gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
+standard_PR8 = gPR8_lab**(3.0/4)
 
-sample_time = 60*day
-# plotting
-figure_name = '-landscape'
+gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
+standard_FM1 = gFM1_lab**(3.0/4)
+bar_width = 1.0
+
+# Sequential immunization graph
+figure_name = '-Original-Antigenic-Sin-infection'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
-
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize = (12, 9))
-for i in range(origin_virus, current_virus + 1):
-    detect_xn = current_virus + 1 - i
-    if detect_xn == origin_virus:
-        virus_label = '$ origin-virus $'
-    elif detect_xn == current_virus:
-        virus_label = '$ current-virus $' 
-    else: virus_label = '$ {:}-virus $'.format(detect_xn)
-    detect_time = int(totalPoint_T/(maxT - minT)*(detect_xn*infection_period + sample_time))
-    plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20
-             , color = AlvaColor[detect_xn - origin_virus], label = virus_label)
-    plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], facecolor = AlvaColor[detect_xn - origin_virus]
-                     , alpha = 0.5)
-    
+plt.figure(numberingFig, figsize = (12, 6))
+plt.subplot(111)
+plt.plot(gT, (gM[origin_virus] + gG[origin_virus]), linewidth = 5.0, alpha = 0.5, color = 'gray'
+         , label = r'$ Origin-virus $')
+plt.plot(gT, (gM[origin_virus + 1] + gG[origin_virus + 1]), linewidth = 5.0, alpha = 0.5, color = 'red'
+         , label = r'$ Subsequence-virus $')
+plt.bar(gT_lab - bar_width/2, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', yerr = standard_PR8
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ PR8-virus $')
+plt.bar(gT_lab + bar_width/2, gFM1_lab, bar_width, alpha = 0.6, color = 'red', yerr = standard_FM1
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ FM1-virus $')
 plt.grid(True, which = 'both')
-plt.title(r'$ Antibody \ Landscape $', fontsize = AlvaFontSize)
-plt.xlabel(r'$ Virus \ space \ (Antigenic-distance) $', fontsize = AlvaFontSize)
+plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
-plt.xlim([minX, maxX])
-plt.xticks(fontsize = AlvaFontSize)
-plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**0, 2**10])
+plt.xticks(fontsize = AlvaFontSize*0.6)
+plt.yticks(fontsize = AlvaFontSize*0.6) 
+plt.xlim([minT, 3*30*day])
+plt.ylim([2**5, 2**14])
 plt.yscale('log', basey = 2)
-plt.legend(loc = (1,0), fontsize = AlvaFontSize)
-plt.savefig(save_figure, dpi = 100)
+# gca()---GetCurrentAxis and Format the ticklabel to be 2**x
+plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: int(2**(np.log(x)/np.log(2)))))
+plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
+plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
+plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 
-# In[5]:
-
-# expected peak of the antibody response
-sample_time = 60*day
-# plotting
-figure_name = '-landscape'
-figure_suffix = '.png'
-save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
-
-numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize = (12, 9))
-
-detect_time = int(totalPoint_T/(maxT - minT)*(4*infection_period + sample_time))
-plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'red', alpha = 0.6
-         , label = r'$ current-generating $')
-plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'red', alpha = 0.3)
-
-detect_time = int(totalPoint_T/(maxT - minT)*(3*infection_period + sample_time))
-plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'yellow', alpha = 0.6
-         , label = r'$ 3rd-existing $')
-plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'yellow', alpha = 0.3)
+# In[ ]:
 
 
-detect_time = int(totalPoint_T/(maxT - minT)*(2*infection_period + sample_time))
-plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'green', alpha = 0.6
-         , label = r'$ 2nd-existing $')
-plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'green', alpha = 0.3)
-
-detect_time = int(totalPoint_T/(maxT - minT)*(1*infection_period + sample_time))
-plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20, color = 'blue', alpha = 0.6
-         , label = r'$ 1st-existing $')
-plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], color = 'blue', alpha = 0.3)
-
-plt.grid(True, which = 'both')
-plt.title(r'$ Antibody \ Landscape $', fontsize = AlvaFontSize)
-plt.xlabel(r'$ Virus \ space \ (Antigenic-distance) $', fontsize = AlvaFontSize)
-plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
-plt.xlim([minX, maxX])
-plt.xticks(fontsize = AlvaFontSize)
-plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**0, 2**10])
-plt.yscale('log', basey = 2)
-plt.legend(loc = (1,0), fontsize = AlvaFontSize)
-plt.savefig(save_figure, dpi = 100)
-plt.show()
 

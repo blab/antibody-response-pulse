@@ -60,8 +60,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
         event_2nd = event_table[2]
         tn_unit = totalPoint_T/(maxT_In - minT_In)
         activeTime = event_parameter[2]
-        originVirus = int(event_parameter[5])
-        currentVirus = int(event_parameter[6])
+        originVirus = event_parameter[5]
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gOutIn_array[-inWay, 0, tn])
@@ -84,11 +83,10 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # 2nd-infection --- set viral infection if tn == specific time 
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
-                # OAS-infection --- for long term infection
-                if xn > originVirus and tn == int(event_1st[xn, 1]*tn_unit):
-                    for OAS_virus in range(int(originVirus), xn):
-                        gOutIn_array[0, OAS_virus, tn] = event_1st[xn, 0] 
-                        event_OAS = event_parameter[3]
+                # OAS-infection
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- for near term infection (memory B-cell from origin-virus is still existing) 
                 if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
@@ -119,10 +117,9 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0]
                 # OAS-infection
-                if xn > originVirus and tn == int(event_1st[xn, 1]*tn_unit):
-                    for OAS_virus in range(int(originVirus), xn):
-                        gOutIn_array[0, OAS_virus, tn] = event_1st[xn, 0] 
-                        event_OAS = event_parameter[3]
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- for near term infection (memory B-cell from origin-virus is still existing) 
                 if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
@@ -153,10 +150,9 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0] 
                 # OAS-infection
-                if xn > originVirus and tn == int(event_1st[xn, 1]*tn_unit):
-                    for OAS_virus in range(int(originVirus), xn):
-                        gOutIn_array[0, OAS_virus, tn] = event_1st[xn, 0] 
-                        event_OAS = event_parameter[3]
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- for near term infection (memory B-cell from origin-virus is still existing) 
                 if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
@@ -187,10 +183,9 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 if tn == int(event_2nd[xn, 1]*tn_unit):
                     gOutIn_array[0, xn, tn] = event_2nd[xn, 0]
                 # OAS-infection
-                if xn > originVirus and tn == int(event_1st[xn, 1]*tn_unit):
-                    for OAS_virus in range(int(originVirus), xn):
-                        gOutIn_array[0, OAS_virus, tn] = event_1st[xn, 0] 
-                        event_OAS = event_parameter[3]
+                if tn == int(event_1st[xn, 1]*tn_unit):
+                    gOutIn_array[0, originVirus, tn] = event_1st[xn, 0] 
+                    event_OAS = event_parameter[3]
                 # OAS+immunity --- for near term infection (memory B-cell from origin-virus is still existing) 
                 if xn == originVirus and event_1st[xn + 1, 0] > 1.0 and tn > int(event_1st[xn + 1, 1]*tn_unit):
                     event_OAS = event_parameter[3] # in-rate of antibody-IgG from memory B-cell
