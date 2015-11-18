@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[1]:
+# In[3]:
 
 '''
 author: Alvason Zhenhua Li
@@ -117,7 +117,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[2]:
+# In[7]:
 
 # setting parameter
 timeUnit = 'day'
@@ -152,6 +152,9 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 mutatRateB = 0.00003/hour # B-cell mutation rate
 mutatRateA = 0.0001/hour # antibody mutation rate
 
+mutatRateB = 0.0000/hour # B-cell mutation rate
+mutatRateA = 0.000/hour # antibody mutation rate
+
 # time boundary and griding condition
 minT = float(0)
 maxT = float(6*28*day)
@@ -179,17 +182,19 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 actRateBg_1st = 0.0002/hour # activation rate of memory B-cell at 1st time (pre-)
 actRateBg_2nd = actRateBg_1st*10 # activation rate of memory B-cell at 2nd time (post-)
 origin_virus = int(1)
+current_virus = int(2)
 event_parameter = np.array([[actRateBg_1st,
                             actRateBg_2nd,
                             14*day,
                             +5/hour,
                             -actRateBm - actRateBg_1st + (actRateBm + actRateBg_1st)/3,
-                            origin_virus]])
+                            origin_virus,
+                            current_virus]])
 # [viral population, starting time, first]
 # [viral population, starting time] ---first
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
-viral_population[origin_virus:-1] = 3
+viral_population[origin_virus:current_virus + 1] = 3
 infection_starting_time = np.arange(int(maxX + 1))*infection_period 
 event_1st = np.zeros([int(maxX + 1), 2])
 event_1st[:, 0] = viral_population
@@ -198,7 +203,7 @@ print ('event_1st = {:}'.format(event_1st))
 
 # [viral population, starting time] ---2nd]
 viral_population = np.zeros(int(maxX + 1))
-viral_population[origin_virus:-1] = 0
+viral_population[origin_virus:current_virus + 1] = 0
 infection_starting_time = np.arange(int(maxX + 1))*0
 event_2nd = np.zeros([int(maxX + 1), 2])
 event_2nd[:, 0] = viral_population
@@ -243,7 +248,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[3]:
+# In[5]:
 
 # Experimental lab data from OAS paper
 gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) + 28
@@ -283,7 +288,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[4]:
+# In[6]:
 
 # Experimental lab data from OAS paper
 gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) + 28
