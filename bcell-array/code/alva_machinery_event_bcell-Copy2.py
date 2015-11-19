@@ -58,7 +58,6 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
         event_parameter = event_table[0]
         event_1st = event_table[1]
         event_repeated = event_table[2]
-        event_vaccine = event_table[3]
         tn_unit = totalPoint_T/(maxT_In - minT_In)
         recoveredTime = event_parameter[2]
         originVirus = int(event_parameter[5])
@@ -94,9 +93,6 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # OAS-immunity --- depress non-origin-virus
                 if xn > originVirus and event_1st[xn, 0] > 1.0                                     and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_press = event_parameter[4] # depress act-rate of memory B-cell from non-origin-virus
-                # 1st-vaccination --- set viral vaccination if tn == specific time 
-                if tn == int(event_vaccine[xn, 1]*tn_unit):
-                    gOutIn_array[1, xn, tn] = event_vaccine[xn, 0] 
                 ###
                 dydt1_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt1_array[:, :]*dt/2 # update output
@@ -129,9 +125,6 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # OAS-immunity --- depress non-origin-virus
                 if xn > originVirus and event_1st[xn, 0] > 1.0                                     and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_press = event_parameter[4] # depress act-rate of memory B-cell from non-origin-virus
-                # 1st-vaccination --- set viral vaccination if tn == specific time 
-                if tn == int(event_vaccine[xn, 1]*tn_unit):
-                    gOutIn_array[1, xn, tn] = event_vaccine[xn, 0]
                 ###
                 dydt2_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt2_array[:, :]*dt/2 # update output
@@ -164,9 +157,6 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # OAS-immunity --- depress non-origin-virus
                 if xn > originVirus and event_1st[xn, 0] > 1.0                                     and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_press = event_parameter[4] # depress act-rate of memory B-cell from non-origin-virus
-                # 1st-vaccination --- set viral vaccination if tn == specific time 
-                if tn == int(event_vaccine[xn, 1]*tn_unit):
-                    gOutIn_array[1, xn, tn] = event_vaccine[xn, 0]
                 ###
                 dydt3_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt3_array[:, :]*dt # update output
@@ -199,9 +189,6 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
                 # OAS-immunity --- depress non-origin-virus
                 if xn > originVirus and event_1st[xn, 0] > 1.0                                     and tn > int(event_1st[xn, 1]*tn_unit):
                     event_OAS_press = event_parameter[4] # depress act-rate of memory B-cell from non-origin-virus
-                # 1st-vaccination --- set viral vaccination if tn == specific time 
-                if tn == int(event_vaccine[xn, 1]*tn_unit):
-                    gOutIn_array[1, xn, tn] = event_vaccine[xn, 0]
                 ###
                 dydt4_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio 
         # solid step (update the next output) by accumulate all the try-steps with proper adjustment

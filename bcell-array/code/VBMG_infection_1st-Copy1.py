@@ -26,27 +26,9 @@ numberingFig = 0
 # plotting
 dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/bcell-array/figure'
 file_name = 'Virus-Bcell-IgM-IgG'
-
-#figure_name = '-equation'
-#file_suffix = '.png'
-#save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
-numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize=(12, 5))
-plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
-          , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\mu_{b}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t) $'         
-         , fontsize = 1.2*AlvaFontSize)
-
-#plt.savefig(save_figure, dpi = 100)
-plt.show()
-
+figure_name = '-equation'
+file_suffix = '.png'
+save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 
 
@@ -252,7 +234,7 @@ gridM = gridOut_array[2]
 gridG = gridOut_array[3]
 
 figure_name = '-first-infection'
-file_suffix = '.png'
+figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 ymin = -100
@@ -264,7 +246,7 @@ for i in range(1):
              , linestyle = '-.')
     plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gridT, gridM[i] + gridG[i], color = 'black', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
+    plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
     plt.bar(gT_lab, gIgG_lab, bar_width, alpha = 0.6, color = 'green', yerr = error_IgG
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgG(X31-virus) $')
@@ -273,9 +255,9 @@ for i in range(1):
     plt.grid(True, which = 'both')
     plt.title(r'$ Antibody \ for \ First-infection $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
-    plt.ylabel(r'$ Serum \ antibody \ (pg/ml) $', fontsize = AlvaFontSize)
-    plt.xticks(fontsize = AlvaFontSize*0.7)
-    plt.yticks(fontsize = AlvaFontSize*0.7) 
+    plt.ylabel(r'$ Serum \ antibody \ (pg/mL) $', fontsize = AlvaFontSize)
+    plt.xticks(fontsize = AlvaFontSize*0.6)
+    plt.yticks(fontsize = AlvaFontSize*0.6) 
     plt.text(maxT*18.0/10, ymax*8.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
     plt.text(maxT*18.0/10, ymax*7.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
     plt.text(maxT*18.0/10, ymax*6.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
@@ -302,7 +284,7 @@ for i in range(1):
              , linestyle = '-.')
     plt.plot(gridT, gridM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gridT, gridM[i] + gridG[i], color = 'black', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
+    plt.plot(gridT, gridM[i] + gridG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
     plt.bar(gT_lab, gIgG_lab, bar_width, alpha = 0.6, color = 'green', yerr = error_IgG
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgG(X31-virus) $')
@@ -311,9 +293,9 @@ for i in range(1):
     plt.grid(True, which = 'both')
     plt.title(r'$ Antibody \ for \ First-infection $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
-    plt.ylabel(r'$ Serum \ antibody \ (pg/ml) $', fontsize = AlvaFontSize)
-    plt.xticks(fontsize = AlvaFontSize*0.7)
-    plt.yticks(fontsize = AlvaFontSize*0.7) 
+    plt.ylabel(r'$ Serum \ antibody \ (pg/mL) $', fontsize = AlvaFontSize)
+    plt.xticks(fontsize = AlvaFontSize*0.6)
+    plt.yticks(fontsize = AlvaFontSize*0.6) 
     plt.ylim(ymin, ymax)
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)

@@ -5,9 +5,9 @@
 # https://github.com/blab/antibody-response-pulse
 # 
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
-# ### Adaptive immune response for repeated infection
+# ### Adaptive immune response for sequential vaccination
 
-# In[1]:
+# In[5]:
 
 '''
 author: Alvason Zhenhua Li
@@ -28,7 +28,7 @@ numberingFig = 0
 
 # plotting
 dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/bcell-array/figure'
-file_name = 'Virus-Bcell-IgM-IgG'
+file_name = 'Vaccine-Bcell-IgM-IgG'
 figure_name = '-equation'
 file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
@@ -36,7 +36,7 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
+plt.title(r'$ Vaccine-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-vaccination) $'
           , fontsize = AlvaFontSize)
 plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
@@ -117,7 +117,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[2]:
+# In[6]:
 
 # setting parameter
 timeUnit = 'day'
@@ -154,7 +154,7 @@ mutatRateA = 0.000/hour # antibody mutation rate
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(12*28*day)
+maxT = float(6*28*day)
 totalPoint_T = int(2*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
@@ -165,7 +165,7 @@ dt = spacingT[1]
 minX = float(0)
 maxX = float(3)
 origin_virus = int(1)
-current_virus = int(2)
+current_virus = int(1)
 
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
@@ -183,7 +183,7 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 actRateBg_1st = 0.0002/hour # activation rate of memory B-cell for 1st-time-infection
 actRateBg_repeated = actRateBg_1st*10 # activation rate of memory B-cell for repeated-infection (same virus)
 recovered_time_1st = 14*day # recovered time of 1st-time infection 
-inRateG_OAS_boost = 5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+inRateG_OAS_boost = 0*5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 actRateBg_OAS_press = -0.00035/hour # depress act-rate from memory B-cell for non-origin-virus
 event_parameter = np.array([actRateBg_1st,
                             actRateBg_repeated,
@@ -192,18 +192,30 @@ event_parameter = np.array([actRateBg_1st,
                             actRateBg_OAS_press,
                             origin_virus,
                             current_virus])
+
+# [vaccine population, starting time] ---first
+vaccine_period = 1*28*day
+viral_population = np.zeros(int(maxX + 1))
+viral_population[origin_virus:current_virus + 1] = 64
+vaccine_starting_time = np.arange(int(maxX + 1))*vaccine_period
+event_vaccine = np.zeros([int(maxX + 1), 2])
+event_vaccine[:, 0] = viral_population
+event_vaccine[:, 1] = vaccine_starting_time
+event_vaccine[0, 1] = 0
+print ('event_vaccine = {:}'.format(event_vaccine)) 
+
 # [viral population, starting time] ---first
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
-infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27
+infection_starting_time = np.arange(int(maxX + 1))*infection_period + vaccine_period
 event_1st = np.zeros([int(maxX + 1), 2])
 event_1st[:, 0] = viral_population
 event_1st[:, 1] = infection_starting_time
-event_1st[0, 1] = 0
+#event_1st[0, 1] = 0
 print ('event_1st = {:}'.format(event_1st)) 
 
-# [viral population, starting time] ---2nd]
+# [viral population, starting time] ---repeated
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 0
 infection_starting_time = np.arange(int(maxX + 1))*0
@@ -212,7 +224,7 @@ event_repeated[:, 0] = viral_population
 event_repeated[:, 1] = infection_starting_time
 print ('event_repeated = {:}'.format(event_repeated)) 
 
-event_table = np.array([event_parameter, event_1st, event_repeated])
+event_table = np.array([event_parameter, event_1st, event_repeated, event_vaccine])
 
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
@@ -252,18 +264,18 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[6]:
+# In[7]:
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([0, 7, 14, 28])*day + infection_period*origin_virus 
-gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
+gT_lab = np.array([0, 7, 14, 28])*day + infection_period + infection_period*origin_virus 
+gPR8_lab = np.array([2**(7 + 1.0/2), 2**9, 2**(9 + 1.0/4), 2**(9 - 1.0/6)])
 standard_PR8 = gPR8_lab**(3.0/4)
 
-gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
+gFM1_lab = np.array([2**(6 + 2.0/5), 2**(7 - 1.0/5), 2**(7 + 1.0/3), 2**(8 - 1.0/5)])
 standard_FM1 = gFM1_lab**(3.0/4)
 bar_width = 2.0
 
-# Sequential infection graph
+# Sequential immunization graph
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = (12, 6))
@@ -277,13 +289,13 @@ plt.bar(gT_lab - bar_width/2, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', 
 plt.bar(gT_lab + bar_width/2, gFM1_lab, bar_width, alpha = 0.6, color = 'red', yerr = standard_FM1
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ FM1-virus $')
 plt.grid(True, which = 'both')
-plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
+plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-vaccination)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xticks(fontsize = AlvaFontSize*0.6)
 plt.yticks(fontsize = AlvaFontSize*0.6) 
 plt.xlim([minT, 6*30*day])
-plt.ylim([2**5, 2**14])
+plt.ylim([2**5, 2**10])
 plt.yscale('log', basey = 2)
 # gca()---GetCurrentAxis and Format the ticklabel to be 2**x
 plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: int(2**(np.log(x)/np.log(2)))))
@@ -292,19 +304,19 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[7]:
+# In[8]:
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) 
-gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
+gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28])
+gPR8_lab = np.array([2**(7 + 1.0/2), 2**9, 2**(9 + 1.0/4), 2**(9 - 1.0/6)])
 standard_PR8 = gPR8_lab**(3.0/4)
 
-gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
+gFM1_lab = np.array([2**(6 + 2.0/5), 2**(7 - 1.0/5), 2**(7 + 1.0/3), 2**(8 - 1.0/5)])
 standard_FM1 = gFM1_lab**(3.0/4)
 bar_width = 1.0
 
-# Sequential infection graph
-figure_name = '-Original-Antigenic-Sin-infection'
+# Sequential immunization graph
+figure_name = '-Original-Antigenic-Sin-vaccination'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
@@ -319,13 +331,13 @@ plt.bar(gT_lab - bar_width/2, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', 
 plt.bar(gT_lab + bar_width/2, gFM1_lab, bar_width, alpha = 0.6, color = 'red', yerr = standard_FM1
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ FM1-virus $')
 plt.grid(True, which = 'both')
-plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
+plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-vaccination)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xticks(fontsize = AlvaFontSize*0.7)
 plt.yticks(fontsize = AlvaFontSize*0.7) 
 plt.xlim([minT, 2*30*day])
-plt.ylim([2**5, 2**14])
+plt.ylim([2**5, 2**10])
 plt.yscale('log', basey = 2)
 # gca()---GetCurrentAxis and Format the ticklabel to be 2**x
 plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: int(2**(np.log(x)/np.log(2)))))

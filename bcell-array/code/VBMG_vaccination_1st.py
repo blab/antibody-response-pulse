@@ -5,7 +5,7 @@
 # https://github.com/blab/antibody-response-pulse/
 # 
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
-# ### Adaptive immune response for repeated infection
+# ### Adaptive immune response for sequential vaccination
 
 # In[1]:
 
@@ -18,6 +18,7 @@ get_ipython().magic(u'matplotlib inline')
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from matplotlib.ticker import FuncFormatter
 
 AlvaFontSize = 23
 AlvaFigSize = (9, 6)
@@ -25,15 +26,15 @@ numberingFig = 0
 
 # plotting
 dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/bcell-array/figure'
-file_name = 'Virus-Bcell-IgM-IgG'
-
+file_name = 'Vaccine-Bcell-IgM-IgG'
 #figure_name = '-equation'
 #file_suffix = '.png'
 #save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
+
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
+plt.title(r'$ Vaccine-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-vaccination) $'
           , fontsize = AlvaFontSize)
 plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
@@ -49,8 +50,7 @@ plt.show()
 
 
 
-
-# define the V-M-G partial differential equations
+# define the V-B-M-G partial differential equations
 def dVdt_array(VBMGxt = [], *args):
     # naming
     V = VBMGxt[0]
@@ -180,15 +180,7 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         gridOutIn_array[-inWay, 0, tn] = np.copy(currentIn_T_Value)
         # end of loop
     return (gridOutIn_array[:-inWay, :])
-
-
-# Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
-gT_lab = np.array([0, 5, 10, 20, 25, 30, 60, 80])
-gIgG_lab = np.array([0, 0.5, 4, 8.5, 8.75, 7.5, 5.5, 4])*10**2 
-error_IgG = gIgG_lab**(4.0/5)
-gIgM_lab = np.array([0, 1.0/3, 3, 1.0/3, 1.0/6, 1.0/10, 0, 0])*10**2
-error_IgM = gIgM_lab**(4.0/5)
-bar_width = 2
+# -----------------------------------------
 
 # setting parameter
 timeUnit = 'day'
@@ -196,10 +188,17 @@ if timeUnit == 'hour':
     hour = float(1); day = float(24); 
 elif timeUnit == 'day':
     day = float(1); hour = float(1)/24; 
-    
-maxV = float(50) # max virus/micro-liter
+
+# Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
+gT_lab = np.array([0, 7, 14, 28])*day
+gFM1_lab = np.array([2**(5 + 1.0/3), 2**7, 2**(8 + 1.0/6), 2**(8 - 1.0/2)])
+error_FM1 = gFM1_lab**(4.0/5)
+bar_width = 2
+
+###
+maxV = float(16) # max vaccine/micro-liter
 inRateV = 0.2/hour # in-rate of virus
-killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
+killRateVm = 0.001/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
 inRateB = 0.06/hour # in-rate of B-cell
@@ -211,8 +210,8 @@ inRateM = 0.16/hour # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
-inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
+inRateG = inRateM/6 # in-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/60 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
@@ -237,7 +236,7 @@ gridB_array = np.zeros([totalGPoint_X, totalGPoint_T])
 gridM_array = np.zeros([totalGPoint_X, totalGPoint_T])
 gridG_array = np.zeros([totalGPoint_X, totalGPoint_T])
 # initial output condition
-gridV_array[0, 0] = float(1)
+gridV_array[0, 0] = float(16)
 gridB_array[0, 0] = float(0)
 gridM_array[0, 0] = float(0)
 gridG_array[0, 0] = float(0)
@@ -251,12 +250,12 @@ gridB = gridOut_array[1]
 gridM = gridOut_array[2]
 gridG = gridOut_array[3]
 
-figure_name = '-first-infection'
+figure_name = '-first-vaccination'
 file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
-ymin = -100
-ymax = 1100
+ymin = -40
+ymax = 400
 for i in range(1):
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
@@ -266,25 +265,24 @@ for i in range(1):
     plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridM[i] + gridG[i], color = 'black', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.bar(gT_lab, gIgG_lab, bar_width, alpha = 0.6, color = 'green', yerr = error_IgG
-        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgG(X31-virus) $')
-    plt.bar(gT_lab - bar_width, gIgM_lab, bar_width, alpha = 0.6, color = 'blue', yerr = error_IgM
-        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgM(X31-virus) $')
+    plt.bar(gT_lab - bar_width/2, gFM1_lab, bar_width, alpha = 0.3, color = 'black', yerr = error_FM1
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ (FM1-vaccine) $')
     plt.grid(True, which = 'both')
-    plt.title(r'$ Antibody \ for \ First-infection $', fontsize = AlvaFontSize)
+    plt.title(r'$ Antibody \ for \ First-Vaccination $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
     plt.ylabel(r'$ Serum \ antibody \ (pg/ml) $', fontsize = AlvaFontSize)
     plt.xticks(fontsize = AlvaFontSize*0.7)
     plt.yticks(fontsize = AlvaFontSize*0.7) 
-    plt.text(maxT*18.0/10, ymax*8.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*7.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*6.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*5.0/10, r'$ \phi_{g} = %f $'%(killRateVg), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*4.0/10, r'$ \mu_{b} = %f $'%(inRateB), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*3.0/10, r'$ \xi_{m} = %f $'%(inRateM), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*2.0/10, r'$ \xi_{g} = %f $'%(inRateG), fontsize = AlvaFontSize)
-    plt.text(maxT*18.0/10, ymax*1.0/10, r'$ \mu_{g} = %f $'%(outRateG), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*8.0/10, r'$ V_{max} = %f $'%(maxV), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*7.0/10, r'$ \mu_{v} = %f $'%(inRateV), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*6.0/10, r'$ \phi_{m} = %f $'%(killRateVm), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*5.0/10, r'$ \phi_{g} = %f $'%(killRateVg), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*4.0/10, r'$ \mu_{b} = %f $'%(inRateB), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*3.0/10, r'$ \xi_{m} = %f $'%(inRateM), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*2.0/10, r'$ \xi_{g} = %f $'%(inRateG), fontsize = AlvaFontSize)
+    plt.text(maxT*16.0/10, ymax*1.0/10, r'$ \mu_{g} = %f $'%(outRateG), fontsize = AlvaFontSize)
     plt.ylim(ymin, ymax)
+    plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
     plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
@@ -294,7 +292,7 @@ for i in range(1):
 
 numberingFig = numberingFig + 1
 ymin = 2**0
-ymax = 1100
+ymax = 2**9
 for i in range(1):
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gridT, gridV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
@@ -304,18 +302,19 @@ for i in range(1):
     plt.plot(gridT, gridG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gridT, gridM[i] + gridG[i], color = 'black', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
              , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
-    plt.bar(gT_lab, gIgG_lab, bar_width, alpha = 0.6, color = 'green', yerr = error_IgG
-        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgG(X31-virus) $')
-    plt.bar(gT_lab - bar_width, gIgM_lab, bar_width, alpha = 0.6, color = 'blue', yerr = error_IgM
-        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ IgM(X31-virus) $')
+    plt.bar(gT_lab - bar_width/2, gFM1_lab, bar_width, alpha = 0.3, color = 'black', yerr = error_FM1
+        , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ (FM1-vaccine) $')
     plt.grid(True, which = 'both')
-    plt.title(r'$ Antibody \ for \ First-infection $', fontsize = AlvaFontSize)
+    plt.title(r'$ Antibody \ for \ First-Vaccination $', fontsize = AlvaFontSize)
     plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
     plt.ylabel(r'$ Serum \ antibody \ (pg/ml) $', fontsize = AlvaFontSize)
     plt.xticks(fontsize = AlvaFontSize*0.7)
     plt.yticks(fontsize = AlvaFontSize*0.7) 
     plt.ylim(ymin, ymax)
     plt.yscale('log', basey = 2)
+    # gca()---GetCurrentAxis and Format the ticklabel to be 2**x
+    plt.gca().yaxis.set_major_formatter(FuncFormatter(lambda x, pos: int(2**(np.log(x)/np.log(2)))))
+    plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
     plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
     plt.show()
 

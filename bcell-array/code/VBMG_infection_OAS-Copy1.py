@@ -36,7 +36,7 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize=(12, 5))
 plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
+plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ repeated-infection) $'
           , fontsize = AlvaFontSize)
 plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
@@ -196,11 +196,10 @@ event_parameter = np.array([actRateBg_1st,
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
-infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27
+infection_starting_time = np.arange(int(maxX + 1))*infection_period 
 event_1st = np.zeros([int(maxX + 1), 2])
 event_1st[:, 0] = viral_population
 event_1st[:, 1] = infection_starting_time
-event_1st[0, 1] = 0
 print ('event_1st = {:}'.format(event_1st)) 
 
 # [viral population, starting time] ---2nd]
@@ -252,10 +251,10 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[6]:
+# In[3]:
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([0, 7, 14, 28])*day + infection_period*origin_virus 
+gT_lab = np.array([0, 7, 14, 28])*day + infection_period + infection_period*origin_virus 
 gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
 standard_PR8 = gPR8_lab**(3.0/4)
 
@@ -263,7 +262,7 @@ gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
 standard_FM1 = gFM1_lab**(3.0/4)
 bar_width = 2.0
 
-# Sequential infection graph
+# Sequential immunization graph
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = (12, 6))
@@ -292,10 +291,10 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[7]:
+# In[4]:
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) 
+gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) + 28
 gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
 standard_PR8 = gPR8_lab**(3.0/4)
 
@@ -303,7 +302,7 @@ gFM1_lab = np.array([0, 2**(6 - 1.0/5), 2**(7 - 1.0/4), 2**(8 + 1.0/4)])
 standard_FM1 = gFM1_lab**(3.0/4)
 bar_width = 1.0
 
-# Sequential infection graph
+# Sequential immunization graph
 figure_name = '-Original-Antigenic-Sin-infection'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
@@ -322,9 +321,9 @@ plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
-plt.xticks(fontsize = AlvaFontSize*0.7)
-plt.yticks(fontsize = AlvaFontSize*0.7) 
-plt.xlim([minT, 2*30*day])
+plt.xticks(fontsize = AlvaFontSize*0.6)
+plt.yticks(fontsize = AlvaFontSize*0.6) 
+plt.xlim([minT, 3*30*day])
 plt.ylim([2**5, 2**14])
 plt.yscale('log', basey = 2)
 # gca()---GetCurrentAxis and Format the ticklabel to be 2**x
