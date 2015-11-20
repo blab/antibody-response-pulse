@@ -81,7 +81,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV)                      + (actRateBm + alva.event_recovered + alva.event_OAS_press)*V[:]*B[:]                      - outRateB*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV)                      + (actRateBm + actRateBg                         + alva.event_recovered + alva.event_OAS_press                         + alva.event_recoveredV + alva.event_OAS_pressV)*V[:]*B[:]                      - (outRateB + alva.event_OAS_slowV)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -113,11 +113,11 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost)*B[:] - consumeRateG*G[:]*V[:] - outRateG*G[:]                      + mutatRateA*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*V[:] - outRateG*G[:]                      + mutatRateA*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dG_dt_array)
 
 
-# In[2]:
+# In[5]:
 
 # setting parameter
 timeUnit = 'day'
@@ -140,6 +140,7 @@ killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 inRateB = 0.06/hour # in-rate of B-cell
 outRateB = inRateB/8 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
+actRateBg = 0.0002/hour # activation rate of naive B-cell
 
 inRateM = 0.16/hour # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
@@ -164,8 +165,6 @@ dt = spacingT[1]
 # space boundary and griding condition
 minX = float(0)
 maxX = float(3)
-origin_virus = int(1)
-current_virus = int(2)
 
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
@@ -179,31 +178,20 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
 #gV_array[1, 0] = float(2)
 
-#[1st-parameter, repeated-parameter, recovered-day, OAS+, OSA-, origin-virus, current-virus]
-actRateBg_1st = 0.0002/hour # activation rate of memory B-cell for 1st-time-infection
-actRateBg_repeated = actRateBg_1st*10 # activation rate of memory B-cell for repeated-infection (same virus)
-recovered_time_1st = 14*day # recovered time of 1st-time infection 
-inRateG_OAS_boost = 5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press = -0.00035/hour # depress act-rate from memory B-cell for non-origin-virus
-event_parameter = np.array([actRateBg_1st,
-                            actRateBg_repeated,
-                            recovered_time_1st,
-                            inRateG_OAS_boost,
-                            actRateBg_OAS_press,
-                            origin_virus,
-                            current_virus])
 # [viral population, starting time] ---first
+origin_virus = int(1)
+current_virus = int(2)
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
 infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27
-event_1st = np.zeros([int(maxX + 1), 2])
-event_1st[:, 0] = viral_population
-event_1st[:, 1] = infection_starting_time
-event_1st[0, 1] = 0
-print ('event_1st = {:}'.format(event_1st)) 
+event_infect = np.zeros([int(maxX + 1), 2])
+event_infect[:, 0] = viral_population
+event_infect[:, 1] = infection_starting_time
+event_infect[0, 1] = 0
+print ('event_infect = {:}'.format(event_infect)) 
 
-# [viral population, starting time] ---2nd]
+# [viral population, starting time] ---repeated
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 0
 infection_starting_time = np.arange(int(maxX + 1))*0
@@ -212,8 +200,54 @@ event_repeated[:, 0] = viral_population
 event_repeated[:, 1] = infection_starting_time
 print ('event_repeated = {:}'.format(event_repeated)) 
 
-event_table = np.array([event_parameter, event_1st, event_repeated])
+# [vaccine population, starting time] ---first
+origin_vaccine = int(1)
+current_vaccine = int(2)
+vaccine_period = 1*28*day
+vaccine_population = np.zeros(int(maxX + 1))
+vaccine_population[origin_vaccine:current_vaccine + 1] = 0
+vaccine_starting_time = np.arange(int(maxX + 1))*vaccine_period - 27
+event_vaccine = np.zeros([int(maxX + 1), 2])
+event_vaccine[:, 0] = vaccine_population
+event_vaccine[:, 1] = vaccine_starting_time
+event_vaccine[0, 1] = 0
+print ('event_vaccine = {:}'.format(event_vaccine)) 
 
+#[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
+min_cell = 0.01 # minimum cell
+recovered_time = 14*day # recovered time of 1st-time infection 
+actRateBg_recovered = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
+inRateG_OAS_boost = 5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press = -0.00035/hour # depress act-rate from memory B-cell for non-origin-virus
+event_infection_parameter = np.array([origin_virus,
+                                      current_virus, 
+                                      min_cell, 
+                                      recovered_time,
+                                      actRateBg_recovered,
+                                      inRateG_OAS_boost,
+                                      actRateBg_OAS_press,
+                                      0.0])
+# vaccination_parameter
+# vaccination_parameter
+# vaccination_parameter
+min_cell_v = 0.001 # minimum cell
+recovered_time_v = 14*day # recovered time of 1st-time infection 
+actRateBg_recovered_v = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
+inRateG_OAS_boost_v = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press_v = -0.0005/hour # depress act-rate from memory B-cell for non-origin-virus
+outRateB_OAS_slow_v = -outRateB/1.4
+event_vaccination_parameter = np.array([origin_vaccine,
+                                        current_vaccine, 
+                                        min_cell_v, 
+                                        recovered_time_v,
+                                        actRateBg_recovered_v,
+                                        inRateG_OAS_boost_v,
+                                        actRateBg_OAS_press_v,
+                                        outRateB_OAS_slow_v])
+
+event_parameter = np.array([event_infection_parameter, event_vaccination_parameter])
+
+event_table = np.array([event_parameter, event_infect, event_repeated, event_vaccine])
 # Runge Kutta numerical solution
 pde_array = np.array([dVdt_array, dBdt_array, dMdt_array, dGdt_array])
 initial_Out = np.array([gV_array, gB_array, gM_array, gG_array])
