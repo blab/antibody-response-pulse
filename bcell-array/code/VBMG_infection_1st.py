@@ -5,7 +5,7 @@
 # https://github.com/blab/antibody-response-pulse/
 # 
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
-# ### Adaptive immune response for repeated infection
+# ### Adaptive immune response for sequential infection
 
 # In[1]:
 

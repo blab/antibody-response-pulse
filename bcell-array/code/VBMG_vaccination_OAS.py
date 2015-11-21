@@ -51,7 +51,7 @@ plt.savefig(save_figure, dpi = 100)
 plt.show()
 
 
-# define the V-M-G partial differential equations
+# define the V-B-M-G partial differential equations
 def dVdt_array(VBMGxt = [], *args):
     # naming
     V = VBMGxt[0]
@@ -117,7 +117,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[21]:
+# In[2]:
 
 # setting parameter
 timeUnit = 'day'
@@ -149,10 +149,9 @@ consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 inRateG = inRateM/6 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/60 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
-
-    
-mutatRateB = 0.0004/hour # Virus mutation rate
-mutatRateA = 0.00002/hour # antibody mutation rate
+ 
+mutatRateB = 0.00009/hour # Virus mutation rate
+mutatRateA = 0.0001/hour # antibody mutation rate
 
 # time boundary and griding condition
 minT = float(0)
@@ -179,19 +178,6 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # initial output condition
 #gV_array[1, 0] = float(2)
 
-# [vaccine population, starting time] ---first
-origin_vaccine = int(1)
-current_vaccine = int(2)
-vaccine_period = 1*28*day
-vaccine_population = np.zeros(int(maxX + 1))
-vaccine_population[origin_vaccine:current_vaccine + 1] = 8
-vaccine_starting_time = np.arange(int(maxX + 1))*vaccine_period - 27
-event_vaccine = np.zeros([int(maxX + 1), 2])
-event_vaccine[:, 0] = vaccine_population
-event_vaccine[:, 1] = vaccine_starting_time
-event_vaccine[0, 1] = 0
-print ('event_vaccine = {:}'.format(event_vaccine)) 
-
 # [viral population, starting time] ---first
 origin_virus = int(1)
 current_virus = int(2)
@@ -214,6 +200,19 @@ event_repeated[:, 0] = viral_population
 event_repeated[:, 1] = infection_starting_time
 print ('event_repeated = {:}'.format(event_repeated)) 
 
+# [vaccine population, starting time] ---first
+origin_vaccine = int(1)
+current_vaccine = int(2)
+vaccine_period = 1*28*day
+vaccine_population = np.zeros(int(maxX + 1))
+vaccine_population[origin_vaccine:current_vaccine + 1] = 8
+vaccine_starting_time = np.arange(int(maxX + 1))*vaccine_period - 27
+event_vaccine = np.zeros([int(maxX + 1), 2])
+event_vaccine[:, 0] = vaccine_population
+event_vaccine[:, 1] = vaccine_starting_time
+event_vaccine[0, 1] = 0
+print ('event_vaccine = {:}'.format(event_vaccine)) 
+
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
 min_cell = 1.0 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
@@ -231,11 +230,11 @@ event_infection_parameter = np.array([origin_virus,
 # vaccination_parameter
 # vaccination_parameter
 # vaccination_parameter
-min_cell_v = 0.001 # minimum cell
+min_cell_v = 0.2 # minimum cell
 recovered_time_v = 14*day # recovered time of 1st-time infection 
-actRateBg_recovered_v = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
+actRateBg_recovered_v = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
 inRateG_OAS_boost_v = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press_v = -0.0005/hour # depress act-rate from memory B-cell for non-origin-virus
+actRateBg_OAS_press_v = -0.001/hour # depress act-rate from memory B-cell for non-origin-virus
 outRateB_OAS_slow_v = -outRateB/1.4
 event_vaccination_parameter = np.array([origin_vaccine,
                                         current_vaccine, 
@@ -305,7 +304,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[7]:
+# In[3]:
 
 # step by step
 numberingFig = numberingFig + 1
