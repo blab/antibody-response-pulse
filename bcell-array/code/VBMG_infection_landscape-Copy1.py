@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[9]:
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
@@ -34,20 +34,20 @@ file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize=(12, 5))
+plt.figure(numberingFig, figsize=(12, 6))
 plt.axis('off')
 plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
           , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\mu_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
+plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)}$'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\mu_{b}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{n}(t)\frac{B_{i-1}(t) - 2B_i(t) + B_{i+1}(t)}{(\Delta i)^2} $'
+plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\xi_{b} + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{n}(t)\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
+plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          +\xi_{g} B_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) - \mu_{g} G_{n}(t)          + m_a \frac{G_{i-1}(t) - 2G_i(t) + G_{i+1}(t)}{(\Delta i)^2} $'         
+plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t) - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)}          - \mu_{g} G_{n}(t) $'         
          , fontsize = 1.2*AlvaFontSize)
 
-plt.savefig(save_figure, dpi = 100)
+plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 # define the V-M-G partial differential equations
@@ -116,7 +116,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[10]:
+# In[2]:
 
 # setting parameter
 timeUnit = 'year'
@@ -154,7 +154,7 @@ mutatRateA = 0.00008/hour # antibody mutation rate
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(10*12*30*day)
+maxT = float(10*12*28*day)
 totalPoint_T = int(6*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
@@ -180,7 +180,7 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # [viral population, starting time] ---first
 origin_virus = int(2)
 current_virus = int(6)
-infection_period = 12*30*day
+infection_period = 12*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
 infection_starting_time = np.arange(int(maxX + 1))*infection_period 
@@ -202,7 +202,7 @@ print ('event_repeated = {:}'.format(event_repeated))
 # [vaccine population, starting time] ---first
 origin_vaccine = int(1)
 current_vaccine = int(2)
-vaccine_period = 1*28*day
+vaccine_period = 12*28*day
 vaccine_population = np.zeros(int(maxX + 1))
 vaccine_population[origin_vaccine:current_vaccine + 1] = 0
 vaccine_starting_time = np.arange(int(maxX + 1))*vaccine_period 
@@ -213,7 +213,7 @@ event_vaccine[0, 1] = 0
 print ('event_vaccine = {:}'.format(event_vaccine)) 
 
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
-min_cell = 0.00001 # minimum cell
+min_cell = 0.1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
 inRateG_OAS_boost = 4/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
@@ -229,7 +229,7 @@ event_infection_parameter = np.array([origin_virus,
 # vaccination_parameter
 # vaccination_parameter
 # vaccination_parameter
-min_cell_v = 0.001 # minimum cell
+min_cell_v = 0.2 # minimum cell
 recovered_time_v = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered_v = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
 inRateG_OAS_boost_v = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
@@ -284,7 +284,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[11]:
+# In[3]:
 
 # Normalization stacked graph
 numberingFig = numberingFig + 1
@@ -301,13 +301,13 @@ plt.grid(True)
 plt.show()
 
 
-# In[12]:
+# In[10]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 30*day
+sample_time = 90*day
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
@@ -329,13 +329,13 @@ for i in range(origin_virus, current_virus + 1):
                      , alpha = 0.5)
     
 plt.grid(True, which = 'both')
-plt.title(r'$ Antibody \ Landscape $', fontsize = AlvaFontSize)
+plt.title(r'$ Antibody \ Landscape \ (Sequential-Infection)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$ Virus \ space \ (Antigenic-distance) $', fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xlim([minX, maxX])
 plt.xticks(fontsize = AlvaFontSize)
 plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**0, 2**14])
+plt.ylim([2**0, 2**10])
 plt.yscale('log', basey = 2)
 plt.legend(loc = (1,0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
