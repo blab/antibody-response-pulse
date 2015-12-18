@@ -25,7 +25,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X, mi
     global event_recoveredV; event_recoveredV = 0.0
     global event_OAS_boostV; event_OAS_boostV = 0.0
     global event_OAS_pressV; event_OAS_pressV = 0.0
-    global event_OAS_slowV; event_OAS_slowV = 0.0  
+    global event_OAS_slowV; event_OAS_slowV = 0.0 
     # primary size of pde equations
     outWay = pde_array.shape[0]
     # initialize the whole memory-space for output and input

@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential vaccination
 
-# In[2]:
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
@@ -51,6 +51,32 @@ plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 # define the V-B-M-G partial differential equations
+
+# inverted-monod equation
+def monodInvert(half_radius, i):
+    if half_radius == 0:
+        gOut = i*0
+        # numpy.reshape will not change the structure of i, 
+        # so that the first element of i(unkonwn-size-array) can be setted by array_to_list[0] 
+        array_to_list = np.reshape(i,[i.size,1]) 
+        array_to_list[0] = 1 
+    else: gOut = 1 - np.absolute(i)/(half_radius + np.absolute(i))
+    return (gOut)
+
+# cross immunity
+def crossI_neighborSum_X(gI, half_radius, gX):
+    total_neighbor_X = gX.shape[0]
+    I_neighborSum = np.zeros(total_neighbor_X)
+    # all I[xn] with neighbor-sum 
+    ratioM = np.zeros([total_neighbor_X, total_neighbor_X])
+    gXX = np.tile(gX, [total_neighbor_X, 1])
+    gII = np.tile(gI, [total_neighbor_X, 1])
+    ratioM[:, :] = monodInvert(half_radius, gXX[:, :] - gXX[:, :].T)
+    I_neighborSum[:] = np.sum(ratioM[:, :] * gII[:, :].T, axis = 0)
+    if half_radius == 0:
+        I_neighborSum = np.copy(gI)
+    return (I_neighborSum)
+
 def dVdt_array(VBMGxt = [], *args):
     # naming
     V = VBMGxt[0]
@@ -61,7 +87,7 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) - killRateVm*M[:]*V[:] - killRateVg*G[:]*V[:]
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -112,7 +138,7 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*V[:] - outRateG*G[:]                      + mutatRateA*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
@@ -150,9 +176,8 @@ outRateG = outRateM/60 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
  
 mutatRateB = 0.00009/hour # Virus mutation rate
-mutatRateA = 0.0001/hour # antibody mutation rate
 
-
+cross_radius = float(0.5) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # time boundary and griding condition
 minT = float(0)
@@ -303,7 +328,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[6]:
+# In[4]:
 
 # expected peak of the antibody response
 totalColor = current_vaccine - origin_vaccine + 1 

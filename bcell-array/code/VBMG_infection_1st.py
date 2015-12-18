@@ -47,9 +47,6 @@ plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          +\xi_{g} B_{
 #plt.savefig(save_figure, dpi = 100)
 plt.show()
 
-
-
-
 # define the V-M-G partial differential equations
 def dVdt_array(VBMGxt = [], *args):
     # naming
@@ -76,7 +73,7 @@ def dBdt_array(VBMGxt = [], *args):
     dB_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
     for xn in range(x_totalPoint):
-        dB_dt_array[xn] = +inRateB + (actRateBm + actRateBg)*B[xn]*V[xn] - outRateB*B[xn]
+        dB_dt_array[xn] = +inRateB*V[xn]*(1 - V[xn]/maxV) + (actRateBm + actRateBg)*B[xn]*V[xn] - outRateB*B[xn]
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -143,8 +140,8 @@ def AlvaRungeKutta4ArrayXT(pde_array, startingOut_Value, minX_In, maxX_In, total
         if gridOutIn_array[0, 0, tn] < 1.0:
             gridOutIn_array[0, 0, tn] = 0.0
         # bottom line --- setting bcell = 1 if bcell < 1
-        if gridOutIn_array[1, 0, tn] < 1.0:
-            gridOutIn_array[1, 0, tn] = 1.0
+        if gridOutIn_array[1, 0, tn] < 1:
+            gridOutIn_array[1, 0, tn] = 1
         # keep initial value at the moment of tn
         currentOut_Value[:, :] = np.copy(gridOutIn_array[:-inWay, :, tn])
         currentIn_T_Value = np.copy(gridOutIn_array[-inWay, 0, tn])
@@ -218,7 +215,7 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 # time boundary and griding condition
 minT = float(0)
 maxT = float(80*day)
-totalGPoint_T = int(3*10**3 + 1)
+totalGPoint_T = int(2*10**3 + 1)
 gridT = np.linspace(minT, maxT, totalGPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalGPoint_T, retstep = True)
 gridT = spacingT[0]
