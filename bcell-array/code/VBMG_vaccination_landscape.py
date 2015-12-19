@@ -38,13 +38,13 @@ plt.figure(numberingFig, figsize=(12, 6))
 plt.axis('off')
 plt.title(r'$ Vaccine-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-vaccination) $'
           , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\xi_{v}V_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)}$'
+plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}})          - \phi_{m} M_{n}(t) V_{n}(t)          - \phi_{g} G_{n}(t) V_{n}(t)$'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\xi_{b} + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{n}(t)\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
+plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b} + (\beta_{m}          + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{m}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
+plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t) - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)}          - \mu_{g} G_{n}(t) $'         
+plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})B_{n}(t)          - \phi_{g} G_{n}(t) V_{n}(t)           - \mu_{g} G_{n}(t) $'         
          , fontsize = 1.2*AlvaFontSize)
 
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -87,7 +87,7 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*V[:]
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -138,7 +138,7 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
+    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost                        + alva.event_OAS_boostV)*crossI_neighborSum_X(B, cross_radius, gX)[:]                      - consumeRateG*G[:]*V[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
@@ -165,7 +165,7 @@ killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 inRateB = 0.06/hour # in-rate of B-cell
 outRateB = inRateB/8 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
-actRateBg = killRateVg # activation rate of memory B-cell for 1st-time-infection
+actRateBg = killRateVg # activation rate of memory B-cell
 
 inRateM = 0.16/hour # in-rate of antibody-IgM from naive B-cell
 outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
@@ -175,13 +175,13 @@ inRateG = inRateM/6 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/60 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
  
-mutatRateB = 0.00009/hour # Virus mutation rate
+mutatRateB = 0.00005/hour # Virus mutation rate
 
-cross_radius = float(0.5) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.01) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # time boundary and griding condition
 minT = float(0)
-maxT = float(12*12*28*day)
+maxT = float(10*12*28*day)
 totalPoint_T = int(6*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
@@ -240,28 +240,29 @@ event_vaccine[0, 1] = 0
 print ('event_vaccine = {:}'.format(event_vaccine)) 
 
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
-min_cell = 0.01 # minimum cell
+min_cell = 0.02 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
-actRateBg_recovered = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 4/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
+inRateG_OAS_boost = 6/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 actRateBg_OAS_press = -0.0004/hour # depress act-rate from memory B-cell for non-origin-virus
+outRateB_OAS_slow = 0.0 # not applied in infection
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
                                       recovered_time,
                                       actRateBg_recovered,
                                       inRateG_OAS_boost,
-                                      actRateBg_OAS_press,
-                                      0.0])
+                                      actRateBg_OAS_press, 
+                                      outRateB_OAS_slow])
 # vaccination_parameter
 # vaccination_parameter
 # vaccination_parameter
-min_cell_v = 0.2 # minimum cell
-recovered_time_v = 14*day # recovered time of 1st-time vaccination 
-actRateBg_recovered_v = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost_v = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+min_cell_v = 0.02 # minimum cell
+recovered_time_v = 14*day # recovered time of 1st-time infection 
+actRateBg_recovered_v = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
+inRateG_OAS_boost_v = 2/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 actRateBg_OAS_press_v = -0.001/hour # depress act-rate from memory B-cell for non-origin-virus
-outRateB_OAS_slow_v = -outRateB/1.4
+outRateB_OAS_slow_v = 0.0 #-outRateB/2.0
 event_vaccination_parameter = np.array([origin_vaccine,
                                         current_vaccine, 
                                         min_cell_v, 
@@ -334,7 +335,7 @@ plt.show()
 totalColor = current_vaccine - origin_vaccine + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 14*day
+sample_time = 40*day
 # plotting
 figure_name = '-landscape'
 file_suffix = '.png'
