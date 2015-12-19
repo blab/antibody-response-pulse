@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[5]:
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
@@ -38,13 +38,13 @@ plt.figure(numberingFig, figsize=(12, 6))
 plt.axis('off')
 plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
           , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}})          - \phi_{m} M_{n}(t) V_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)$'
+plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}})          - \phi_{m} M_{n}(t) V_{n}(t)          - \phi_{g} G_{n}(t) V_{n}(t)$'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b} + (\beta_{m}          + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b \frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
+plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b} + (\beta_{m}          + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t)          + m_b V_{m}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)}          - \mu_{g} G_{n}(t) $'         
+plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)           - \mu_{g} G_{n}(t) $'         
          , fontsize = 1.2*AlvaFontSize)
 
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -87,7 +87,7 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*crossI_neighborSum_X(V, cross_radius, gX)
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -106,7 +106,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV)                      + (actRateBm + actRateBg                         + alva.event_recovered + alva.event_OAS_press                         + alva.event_recoveredV + alva.event_OAS_pressV)*V[:]*B[:]                      - (outRateB + alva.event_OAS_slowV)*B[:]                      + mutatRateB*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB*V[:]*(1 - V[:]/maxV)                      + (actRateBm + actRateBg                         + alva.event_recovered + alva.event_OAS_press                         + alva.event_recoveredV + alva.event_OAS_pressV)*V[:]*B[:]                      - (outRateB + alva.event_OAS_slowV)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -138,7 +138,7 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
+    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)                      - outRateG*G[:]                      + mutatRateB*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dG_dt_array)
 
 
@@ -177,7 +177,7 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
 mutatRateB = 0.00009/hour # Virus mutation rate
 
-cross_radius = float(0.0002) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.00) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # time boundary and griding condition
 minT = float(0)
@@ -240,11 +240,11 @@ event_vaccine[0, 1] = 0
 print ('event_vaccine = {:}'.format(event_vaccine)) 
 
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
-min_cell = 0.2 # minimum cell
+min_cell = 0.0002 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 0/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press = -0.000/hour # depress act-rate from memory B-cell for non-origin-virus
+inRateG_OAS_boost = 5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press = -0.00044/hour # depress act-rate from memory B-cell for non-origin-virus
 outRateB_OAS_slow = 0.0 # not applied in infection
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
