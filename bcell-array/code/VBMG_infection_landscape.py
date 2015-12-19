@@ -44,7 +44,7 @@ plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b} +
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \mu_{g} G_{n}(t)          + m_a \frac{G_{n-1}(t) - 2G_n(t) + G_{n+1}(t)}{(\Delta n)^2} $'         
+plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \mu_{g} G_{n}(t)          - \phi_{g} G_{n}(t) V_{n}(t)          + m_a \frac{G_{n-1}(t) - 2G_n(t) + G_{n+1}(t)}{(\Delta n)^2} $'         
          , fontsize = 1.2*AlvaFontSize)
 
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -329,13 +329,13 @@ plt.grid(True)
 plt.show()
 
 
-# In[4]:
+# In[7]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 80*day
+sample_time = 14*day
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
