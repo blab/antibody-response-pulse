@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[1]:
+# In[22]:
 
 '''
 author: Alvason Zhenhua Li
@@ -44,7 +44,7 @@ plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b} +
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \phi_{g} G_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{n}(t)           - \mu_{g} G_{n}(t) $'         
+plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})B_{n}(t)          - \phi_{g} G_{n}(t) V_{n}(t)           - \mu_{g} G_{n}(t) $'         
          , fontsize = 1.2*AlvaFontSize)
 
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -87,7 +87,7 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*crossI_neighborSum_X(V, cross_radius, gX)
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*G[:]*V[:]
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -138,11 +138,11 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)                      - outRateG*G[:]                      + mutatRateB*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost                        + alva.event_OAS_boostV)*crossI_neighborSum_X(B, cross_radius, gX)[:]                      - consumeRateG*G[:]*V[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
-# In[2]:
+# In[26]:
 
 # setting parameter
 timeUnit = 'day'
@@ -175,9 +175,9 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.00009/hour # Virus mutation rate
+mutatRateB = 0.00005/hour # Virus mutation rate
 
-cross_radius = float(0.00) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.001) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # time boundary and griding condition
 minT = float(0)
@@ -240,11 +240,11 @@ event_vaccine[0, 1] = 0
 print ('event_vaccine = {:}'.format(event_vaccine)) 
 
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
-min_cell = 0.0002 # minimum cell
+min_cell = 0.00002 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press = -0.00044/hour # depress act-rate from memory B-cell for non-origin-virus
+inRateG_OAS_boost = 6/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press = -0.0001/hour # depress act-rate from memory B-cell for non-origin-virus
 outRateB_OAS_slow = 0.0 # not applied in infection
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
@@ -337,7 +337,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[3]:
+# In[27]:
 
 # step by step
 numberingFig = numberingFig + 1
@@ -367,7 +367,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[4]:
+# In[25]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab_fresh = np.array([0, 5, 10, 20, 25])

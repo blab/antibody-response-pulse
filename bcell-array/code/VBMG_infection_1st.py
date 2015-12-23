@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[1]:
+# In[35]:
 
 '''
 author: Alvason Zhenhua Li
@@ -37,7 +37,7 @@ plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ seque
           , fontsize = AlvaFontSize)
 plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          +\xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) - \phi_{m} M_{n}(t) V_{n}(t) - \phi_{g} G_{n}(t) V_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\xi_{b}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t) $'
+plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          +\xi_{b} + (\beta_{m} + \beta_{g}) V_{n}(t) B_{n}(t) - \mu_{b} B_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
 plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          +\xi_{m} B_{n}(t) - \phi_{m} M_{n}(t) V_{n}(t) - \mu_{m} M_{n}(t) $'
          , fontsize = 1.2*AlvaFontSize)
@@ -73,7 +73,7 @@ def dBdt_array(VBMGxt = [], *args):
     dB_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
     for xn in range(x_totalPoint):
-        dB_dt_array[xn] = +inRateB*V[xn]*(1 - V[xn]/maxV) + (actRateBm + actRateBg)*B[xn]*V[xn] - outRateB*B[xn]
+        dB_dt_array[xn] = +inRateB + (actRateBm + actRateBg)*B[xn]*V[xn] - outRateB*B[xn]
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -199,8 +199,8 @@ inRateV = 0.2/hour # in-rate of virus
 killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.06/hour # in-rate of B-cell
-outRateB = inRateB/8 # out-rate of B-cell
+inRateB = 0.01/hour # in-rate of B-cell
+outRateB = inRateB/1.5 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of memory B-cell
 
@@ -287,7 +287,7 @@ for i in range(1):
     plt.show()
 
 
-# In[2]:
+# In[36]:
 
 numberingFig = numberingFig + 1
 ymin = 2**0
