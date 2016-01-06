@@ -28,7 +28,7 @@ numberingFig = 0
 
 # equation
 dir_path = '/Users/al/Desktop/GitHub/antibody-response-pulse/figure'
-file_name = 'VBMG-OAS'
+file_name = 'VBMG-infection'
 figure_name = '-equation'
 file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
@@ -254,18 +254,18 @@ gG = gOut_array[3]
 
 numberingFig = numberingFig + 1
 for i in range(totalPoint_X):
-    figure_name = '-response-%i'%(i)
+    figure_name = '-response-{:}'.format(i)
     figure_suffix = '.png'
     save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
     plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gV[i], color = 'red', label = r'$ V_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
-             , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
+             , label = r'$ IgM_{:}(t) + IgG_{:}(t) $'.format(i, i))
     plt.grid(True, which = 'both')
-    plt.title(r'$ Antibody \ responses \ to \ Virus-{%i} $'%(i), fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+    plt.title(r'$ Antibody \ responses \ to \ Virus-{:} $'.format(i), fontsize = AlvaFontSize)
+    plt.xlabel(r'$time \ ({:})$'.format(timeUnit), fontsize = AlvaFontSize)
     plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
     plt.xlim([minT, maxT])
     plt.xticks(fontsize = AlvaFontSize*0.6)
@@ -284,7 +284,7 @@ numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = AlvaFigSize)
 plt.stackplot(gT, gM + gG, alpha = 0.3)
 plt.title(r'$ Stacked-graph \ of \ Antibody $', fontsize = AlvaFontSize)
-plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ ({:})$'.format(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xticks(fontsize = AlvaFontSize*0.6)
 plt.yticks(fontsize = AlvaFontSize*0.6) 
@@ -294,7 +294,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[5]:
+# In[4]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
