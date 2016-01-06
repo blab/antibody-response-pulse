@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[37]:
+# In[9]:
 
 '''
 author: Alvason Zhenhua Li
@@ -142,7 +142,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[38]:
+# In[10]:
 
 # setting parameter
 timeUnit = 'day'
@@ -240,11 +240,11 @@ event_vaccine[0, 1] = 0
 print ('event_vaccine = {:}'.format(event_vaccine)) 
 
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
-min_cell = 1.0 # minimum cell
+min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
 inRateG_OAS_boost = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press = -0.00/hour # depress act-rate from memory B-cell for non-origin-virus
+actRateBg_OAS_press = -0.000/hour # depress act-rate from memory B-cell for non-origin-virus
 outRateB_OAS_slow = 0.0 # not applied in infection
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
@@ -337,7 +337,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[39]:
+# In[11]:
 
 # step by step
 numberingFig = numberingFig + 1
@@ -367,7 +367,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[40]:
+# In[12]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab_fresh = np.array([0, 5, 10, 20, 25])

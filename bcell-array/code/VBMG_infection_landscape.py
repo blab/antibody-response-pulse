@@ -177,7 +177,7 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
 mutatRateB = 0.000033/hour # Virus mutation rate
 
-cross_radius = float(0.02) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(1) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # time boundary and griding condition
 minT = float(0)
@@ -329,7 +329,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[8]:
+# In[4]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
