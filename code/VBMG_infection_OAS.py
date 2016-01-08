@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[1]:
+# In[19]:
 
 '''
 author: Alvason Zhenhua Li
@@ -65,7 +65,7 @@ plt.savefig(save_figure, dpi = 100)
 plt.show()
 
 
-# In[2]:
+# In[20]:
 
 '''define the V-B-M-G partial differential equations'''
 
@@ -159,7 +159,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[3]:
+# In[21]:
 
 # setting parameter
 timeUnit = 'day'
@@ -194,7 +194,7 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
 mutatRateB = 0.00005/hour # Virus mutation rate
 
-cross_radius = float(0.00) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.01) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 # time boundary and griding condition
 minT = float(0)
 maxT = float(7*28*day)
@@ -247,7 +247,7 @@ print ('event_repeated = {:}'.format(event_repeated))
 min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+inRateG_OAS_boost = 1.2/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
@@ -320,7 +320,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[4]:
+# In[22]:
 
 # step by step
 numberingFig = numberingFig + 1
@@ -351,10 +351,10 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[5]:
+# In[23]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
-gT_lab_fresh = np.array([0, 5, 10, 20, 25])
+gT_lab_fresh = np.array([0, 5, 10, 20, 25])*day
 gIgG_lab_fresh = np.array([0, 0.5, 4, 8.5, 8.75])*10**2 
 error_IgG_fresh = gIgG_lab_fresh**(4.0/5)
 gIgM_lab_fresh = np.array([0, 1.0/3, 3, 1.0/3, 1.0/6])*10**2
@@ -364,7 +364,7 @@ error_lab_fresh = error_IgG_fresh + error_IgM_fresh
 bar_width = 1
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([28, 28 + 7, 28 + 14, 28 + 28]) 
+gT_lab = np.array([0, 7, 14, 28])*day + infection_period
 gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
 error_PR8 = gPR8_lab**(3.0/4)
 
@@ -379,9 +379,9 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = (12, 6))
 plt.subplot(111)
-plt.plot(gT, (gM[origin_virus] + gG[origin_virus]), linewidth = 5.0, alpha = 0.5, color = 'black'
+plt.plot(gT - infection_period*origin_virus - origin_virus_starting_time, (gM[origin_virus] + gG[origin_virus]), linewidth = 5.0, alpha = 0.5, color = 'black'
          , label = r'$ Origin-virus $')
-plt.plot(gT, (gM[origin_virus + 1] + gG[origin_virus + 1]), linewidth = 5.0, alpha = 0.5, color = 'red'
+plt.plot(gT - infection_period*origin_virus - origin_virus_starting_time, (gM[origin_virus + 1] + gG[origin_virus + 1]), linewidth = 5.0, alpha = 0.5, color = 'red'
          , label = r'$ Subsequence-virus $')
 plt.bar(gT_lab - bar_width/2, gPR8_lab, bar_width, alpha = 0.6, color = 'gray', yerr = error_PR8
         , error_kw = dict(elinewidth = 1, ecolor = 'black'), label = r'$ PR8-virus $')
@@ -404,19 +404,6 @@ plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
 plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
-
-
-# In[6]:
-
-# [viral population, starting time] ---first
-origin_virus = int(1)
-current_virus = int(2)
-origin_virus_starting_time = 50*day
-infection_period = 1*28*day
-viral_population = np.zeros(int(maxX + 1))
-viral_population[origin_virus:current_virus + 1] = 4
-infection_starting_time = np.arange(int(maxX + 1))*infection_period + origin_virus_starting_time
-print infection_starting_time
 
 
 # In[ ]:
