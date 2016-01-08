@@ -33,23 +33,41 @@ figure_name = '-equation'
 file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
+text_list = [r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection)$'
+             , r'$ \frac{\partial V_n(t)}{\partial t} = \
+             + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) \
+             - \phi_{m} V_{n}(t) M_{n}(t) \
+             - \phi_{g} V_{n}(t) [\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})G_{j}(t)] $'
+             , r'$ \frac{\partial B_n(t)}{\partial t} = \
+             + \xi_{b} \
+             + \beta_{m} B_{n}(t) V_{n}(t)  \
+             + \beta_{g} B_{n}(t)[\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)] \
+             - \mu_{b} B_{n}(t) \
+             + m_b V_{n}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
+             , r'$ \frac{\partial M_n(t)}{\partial t} = \
+             + \xi_{m} B_{n}(t) \
+             - \phi_{m} M_{n}(t) V_{n}(t) \
+             - \mu_{m} M_{n}(t) $'
+             , r'$ \frac{\partial G_n(t)}{\partial t} = \
+             + \xi_{g} B_{n}(t) \
+             - \phi_{g} G_{n}(t) [\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)]  \
+             - \mu_{g} G_{n}(t) $'
+            ]
+total_list = np.size(text_list)
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize=(12, 6))
+plt.figure(numberingFig, figsize=(total_list, total_list*1.5))
 plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
-          , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}})          - \phi_{m} V_{n}(t) M_{n}(t)          - \phi_{g} V_{n}(t) \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})G_{j}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b}          + \beta_{m} B_{n}(t) V_{n}(t)           + \beta_{g} B_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)           - \mu_{b} B_{n}(t)          + m_b V_{n}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \phi_{g} G_{n}(t) \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)           - \mu_{g} G_{n}(t) $'         
-         , fontsize = 1.2*AlvaFontSize)
-
-plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
+for i in range(total_list):
+    plt.text(0, (total_list - float(i))/total_list
+             , text_list[i].replace('\\\n', '')
+             , fontsize = 1.2*AlvaFontSize)
+plt.savefig(save_figure, dpi = 100)
 plt.show()
-# define the V-B-M-G partial differential equations
+
+
+# In[2]:
+
+'''define the V-B-M-G partial differential equations'''
 
 # inverted-monod equation
 def monodInvert(half_radius, i):
@@ -105,7 +123,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered)                         *B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg + alva.event_recovered)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -141,7 +159,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[2]:
+# In[3]:
 
 # setting parameter
 timeUnit = 'day'
@@ -162,7 +180,7 @@ killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
 inRateB = 0.01/hour # in-rate of B-cell
-outRateB = inRateB/1.5 # out-rate of B-cell
+outRateB = inRateB/1 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of naive B-cell
 
@@ -174,10 +192,9 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.00002/hour # Virus mutation rate
+mutatRateB = 0.00005/hour # Virus mutation rate
 
-cross_radius = float(0.01) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
-
+cross_radius = float(0.00) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 # time boundary and griding condition
 minT = float(0)
 maxT = float(7*28*day)
@@ -206,10 +223,11 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # [viral population, starting time] ---first
 origin_virus = int(1)
 current_virus = int(2)
+origin_virus_starting_time = 50*day
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
-infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27
+infection_starting_time = np.arange(int(maxX + 1))*infection_period + origin_virus_starting_time
 event_infect = np.zeros([int(maxX + 1), 2])
 event_infect[:, 0] = viral_population
 event_infect[:, 1] = infection_starting_time
@@ -253,7 +271,7 @@ gM = gOut_array[2]
 gG = gOut_array[3]
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
-gT_lab_fresh = np.array([0, 5, 10, 20, 25])
+gT_lab_fresh = np.array([0, 5, 10, 20, 25])*day + infection_period*origin_virus + origin_virus_starting_time
 gIgG_lab_fresh = np.array([0, 0.5, 4, 8.5, 8.75])*10**2 
 error_IgG_fresh = gIgG_lab_fresh**(4.0/5)
 gIgM_lab_fresh = np.array([0, 1.0/3, 3, 1.0/3, 1.0/6])*10**2
@@ -263,7 +281,7 @@ error_lab_fresh = error_IgG_fresh + error_IgM_fresh
 bar_width = 1
 
 # Experimental lab data from OAS paper
-gT_lab = np.array([0, 7, 14, 28])*day + infection_period*origin_virus 
+gT_lab = np.array([0, 7, 14, 28])*day + infection_period*(1 + origin_virus) + origin_virus_starting_time
 gPR8_lab = np.array([2**(9 + 1.0/10), 2**(13 - 1.0/5), 2**(13 + 1.0/3), 2**(13 - 1.0/4)])
 standard_PR8 = gPR8_lab**(3.0/4)
 
@@ -302,37 +320,38 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[3]:
+# In[4]:
 
 # step by step
 numberingFig = numberingFig + 1
 for i in range(totalPoint_X):
-    figure_name = '-response-%i'%(i)
+    figure_name = '-response-{:}'.format(i)
     figure_suffix = '.png'
     save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
     plt.figure(numberingFig, figsize = AlvaFigSize)
-    plt.plot(gT, gV[i], color = 'red', label = r'$ V_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gT, gB[i], color = 'purple', label = r'$ B_{%i}(t) $'%(i), linewidth = 5.0, alpha = 0.5
+    plt.plot(gT, gV[i], color = 'red', label = r'$ V_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gB[i], color = 'purple', label = r'$ B_{:}(t) $'.format(i), linewidth = 5.0, alpha = 0.5
              , linestyle = '-.')
-    plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
-    plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{%i}(t) $'%(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'
-             , label = r'$ IgM_{%i}(t) + IgG_{%i}(t) $'%(i, i))
+             , label = r'$ IgM_{:}(t) + IgG_{:}(t) $'.format(i, i))
     plt.grid(True, which = 'both')
-    plt.title(r'$ Antibody \ from \ Virus-{%i} $'%(i), fontsize = AlvaFontSize)
-    plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
+    plt.title(r'$ Antibody \ responses \ to \ Virus-{:} $'.format(i), fontsize = AlvaFontSize)
+    plt.xlabel(r'$time \ ({:})$'.format(timeUnit), fontsize = AlvaFontSize)
     plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
     plt.xlim([minT, maxT])
     plt.xticks(fontsize = AlvaFontSize*0.6)
     plt.yticks(fontsize = AlvaFontSize*0.6) 
     plt.ylim([2**0, 2**14])
+#    plt.ylim([0.1, 2**4])
     plt.yscale('log', basey = 2)
     plt.legend(loc = (1,0), fontsize = AlvaFontSize)
-    plt.savefig(save_figure, dpi = 100)
+    plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
     plt.show()
 
 
-# In[4]:
+# In[5]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab_fresh = np.array([0, 5, 10, 20, 25])
@@ -354,7 +373,7 @@ error_FM1 = gFM1_lab**(3.0/4)
 bar_width = 1.0
 
 # Sequential infection graph
-figure_name = '-Original-Antigenic-Sin-infection'
+figure_name = '-infection'
 figure_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 numberingFig = numberingFig + 1
@@ -385,6 +404,19 @@ plt.gca().xaxis.set_major_locator(plt.MultipleLocator(7))
 plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
+
+
+# In[6]:
+
+# [viral population, starting time] ---first
+origin_virus = int(1)
+current_virus = int(2)
+origin_virus_starting_time = 50*day
+infection_period = 1*28*day
+viral_population = np.zeros(int(maxX + 1))
+viral_population[origin_virus:current_virus + 1] = 4
+infection_starting_time = np.arange(int(maxX + 1))*infection_period + origin_virus_starting_time
+print infection_starting_time
 
 
 # In[ ]:

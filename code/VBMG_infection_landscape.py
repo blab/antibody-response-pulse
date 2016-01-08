@@ -259,6 +259,8 @@ for i in range(totalPoint_X):
     save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
     plt.figure(numberingFig, figsize = AlvaFigSize)
     plt.plot(gT, gV[i], color = 'red', label = r'$ V_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
+    plt.plot(gT, gB[i], color = 'purple', label = r'$ B_{:}(t) $'.format(i), linewidth = 5.0, alpha = 0.5
+             , linestyle = '-.')
     plt.plot(gT, gM[i], color = 'blue', label = r'$ IgM_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gT, gG[i], color = 'green', label = r'$ IgG_{:}(t) $'.format(i), linewidth = 3.0, alpha = 0.5)
     plt.plot(gT, gM[i] + gG[i], color = 'gray', linewidth = 5.0, alpha = 0.5, linestyle = 'dashed'

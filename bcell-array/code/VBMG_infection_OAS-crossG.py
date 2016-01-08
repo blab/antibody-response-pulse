@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for repeated infection
 
-# In[5]:
+# In[21]:
 
 '''
 author: Alvason Zhenhua Li
@@ -142,7 +142,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[2]:
+# In[22]:
 
 # setting parameter
 timeUnit = 'day'
@@ -337,7 +337,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[3]:
+# In[23]:
 
 # step by step
 numberingFig = numberingFig + 1
@@ -367,7 +367,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[4]:
+# In[24]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab_fresh = np.array([0, 5, 10, 20, 25])
