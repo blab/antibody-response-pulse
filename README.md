@@ -11,7 +11,7 @@ Model of cross-reactive antibody response from B cells after influenza virus inf
 ![](figure/VBMG-infection-equation.png)
 
 ### [original antigenic sin --- from sequential infection ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_infection_OAS.ipynb)
-![](figure/VBMG-Original-Antigenic-Sin-infection.png)
+![](figure/VBMG-OAS-infection.png)
 
 ### [original antigenic sin --- from sequential vaccination ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_vaccinationn_OAS.ipynb)
 ![](figure/VBMG-Original-Antigenic-Sin-vaccination.png)
