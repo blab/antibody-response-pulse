@@ -7,7 +7,7 @@ Model of cross-reactive antibody response from B cells after influenza virus inf
 ### [antibody landscape --- from sequential vaccination ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_vaccination_landscape.ipynb)
 ![](figure/VBMG-vaccination-landscape.png)
 
-### [Virus-Bcell-IgM-IgG Model --- Bcell mutation and IgG cross-immunity ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_infetion_landscape.ipynb)
+### [Virus-Bcell-IgM-IgG Model --- Bcell mutation and IgG cross-immunity ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_infection_landscape.ipynb)
 ![](figure/VBMG-infection-equation.png)
 
 ### [original antigenic sin --- from sequential infection ](https://github.com/blab/antibody-response-pulse/blob/master/code/VBMG_infection_OAS.ipynb)
