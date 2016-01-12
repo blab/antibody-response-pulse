@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[19]:
+# In[33]:
 
 '''
 author: Alvason Zhenhua Li
@@ -65,7 +65,7 @@ plt.savefig(save_figure, dpi = 100)
 plt.show()
 
 
-# In[20]:
+# In[34]:
 
 '''define the V-B-M-G partial differential equations'''
 
@@ -123,7 +123,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg + alva.event_recovered)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered                         + alva.event_OAS_boost)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -155,11 +155,11 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
+    dG_dt_array[:] = +inRateG*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
-# In[21]:
+# In[35]:
 
 # setting parameter
 timeUnit = 'day'
@@ -174,12 +174,12 @@ elif timeUnit == 'year':
     day = float(1)/365
     hour = float(1)/24/365 
     
-maxV = float(50) # max virus/micro-liter
+maxV = float(60) # max virus/micro-liter
 inRateV = 0.2/hour # in-rate of virus
 killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.01/hour # in-rate of B-cell
+inRateB = 0.0075/hour # in-rate of B-cell
 outRateB = inRateB/1 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of naive B-cell
@@ -192,9 +192,9 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.00005/hour # Virus mutation rate
+mutatRateB = 0.00004/hour # Virus mutation rate
 
-cross_radius = float(0.01) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.4) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 # time boundary and griding condition
 minT = float(0)
 maxT = float(7*28*day)
@@ -223,7 +223,7 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # [viral population, starting time] ---first
 origin_virus = int(1)
 current_virus = int(2)
-origin_virus_starting_time = 50*day
+origin_virus_starting_time = (100 - 28*2)*day
 infection_period = 1*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
@@ -247,7 +247,7 @@ print ('event_repeated = {:}'.format(event_repeated))
 min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 1.2/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+inRateG_OAS_boost = actRateBg*15 # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
@@ -308,7 +308,7 @@ plt.grid(True, which = 'both')
 plt.title(r'$ Original \ Antigenic \ Sin \ (sequential-infection)$', fontsize = AlvaFontSize)
 plt.xlabel(r'$time \ (%s)$'%(timeUnit), fontsize = AlvaFontSize)
 plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
-plt.xticks(fontsize = AlvaFontSize*0.6)
+plt.xticks(fontsize = AlvaFontSize*0.6) 
 plt.yticks(fontsize = AlvaFontSize*0.6) 
 plt.xlim([minT, 6*30*day])
 plt.ylim([2**5, 2**14])
@@ -320,7 +320,7 @@ plt.legend(loc = (1, 0), fontsize = AlvaFontSize)
 plt.show()
 
 
-# In[22]:
+# In[36]:
 
 # step by step
 numberingFig = numberingFig + 1
@@ -351,7 +351,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[23]:
+# In[37]:
 
 # Experimental lab data from (Quantifying the Early Immune Response and Adaptive Immune) paper
 gT_lab_fresh = np.array([0, 5, 10, 20, 25])*day

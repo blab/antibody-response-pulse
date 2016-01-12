@@ -33,23 +33,38 @@ figure_name = '-equation'
 file_suffix = '.png'
 save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
+text_list = [r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection)$'
+             , r'$ \frac{\partial V_n(t)}{\partial t} = \
+             + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}}) \
+             - \phi_{m} V_{n}(t) M_{n}(t) \
+             - \phi_{g} V_{n}(t) [\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})G_{j}(t)] $'
+             , r'$ \frac{\partial B_n(t)}{\partial t} = \
+             + \xi_{b} \
+             + \beta_{m} B_{n}(t) V_{n}(t)  \
+             + \beta_{g} B_{n}(t)[\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)] \
+             - \mu_{b} B_{n}(t) \
+             + m_b V_{n}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
+             , r'$ \frac{\partial M_n(t)}{\partial t} = \
+             + \xi_{m} B_{n}(t) \
+             - \phi_{m} M_{n}(t) V_{n}(t) \
+             - \mu_{m} M_{n}(t) $'
+             , r'$ \frac{\partial G_n(t)}{\partial t} = \
+             + \xi_{g} B_{n}(t) \
+             - \phi_{g} G_{n}(t) [\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)]  \
+             - \mu_{g} G_{n}(t) $'
+            ]
+total_list = np.size(text_list)
 numberingFig = numberingFig + 1
-plt.figure(numberingFig, figsize=(12, 6))
+plt.figure(numberingFig, figsize=(total_list, total_list*1.5))
 plt.axis('off')
-plt.title(r'$ Virus-Bcell-IgM-IgG \ equations \ (antibody-response \ for \ sequential-infection) $'
-          , fontsize = AlvaFontSize)
-plt.text(0, 7.0/9, r'$ \frac{\partial V_n(t)}{\partial t} =          + \xi_{v}V_{n}(t)(1 - \frac{V_n(t)}{V_{max}})          - \phi_{m} V_{n}(t) M_{n}(t)          - \phi_{g} V_{n}(t) \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})G_{j}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 5.0/9, r'$ \frac{\partial B_n(t)}{\partial t} =          + \xi_{b}          + \beta_{m} B_{n}(t) V_{n}(t)           + \beta_{g} B_{n}(t)\sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)           - \mu_{b} B_{n}(t)          + m_b V_{n}\frac{B_{n-1}(t) - 2B_n(t) + B_{n+1}(t)}{(\Delta n)^2} $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 3.0/9,r'$ \frac{\partial M_n(t)}{\partial t} =          + \xi_{m} B_{n}(t)          - \phi_{m} M_{n}(t) V_{n}(t)          - \mu_{m} M_{n}(t) $'
-         , fontsize = 1.2*AlvaFontSize)
-plt.text(0, 1.0/9,r'$ \frac{\partial G_n(t)}{\partial t} =          + \xi_{g} B_{n}(t)          - \phi_{g} G_{n}(t) \sum_{j = 1}^{N} (1 - \frac{|j - n|}{r + |j - n|})V_{j}(t)           - \mu_{g} G_{n}(t) $'         
-         , fontsize = 1.2*AlvaFontSize)
-
-plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
+for i in range(total_list):
+    plt.text(0, (total_list - float(i))/total_list
+             , text_list[i].replace('\\\n', '')
+             , fontsize = 1.2*AlvaFontSize)
+plt.savefig(save_figure, dpi = 100)
 plt.show()
 # define the V-B-M-G partial differential equations
+'''define the V-B-M-G partial differential equations'''
 
 # inverted-monod equation
 def monodInvert(half_radius, i):
@@ -86,7 +101,9 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*V[:]*crossI_neighborSum_X(G, cross_radius, gX)[:]
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) \
+                     - killRateVm*M[:]*V[:] \
+                     - killRateVg*V[:]*crossI_neighborSum_X(G, cross_radius, gX)[:]
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -105,7 +122,13 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered)                         *B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB \
+                     + actRateBm*V[:]*B[:] \
+                     + (actRateBg \
+                        + alva.event_recovered \
+                        + alva.event_OAS_boost)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:] \
+                     - (outRateB)*B[:] \
+                     + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -137,7 +160,9 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
+    dG_dt_array[:] = +inRateG*B[:] \
+                     - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:] \
+                     - outRateG*G[:]
     return(dG_dt_array)
 
 
@@ -156,13 +181,13 @@ elif timeUnit == 'year':
     day = float(1)/365
     hour = float(1)/24/365 
     
-maxV = float(50) # max virus/micro-liter
+maxV = float(60) # max virus/micro-liter
 inRateV = 0.2/hour # in-rate of virus
 killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.01/hour # in-rate of B-cell
-outRateB = inRateB/1.5 # out-rate of B-cell
+inRateB = 0.0075/hour # in-rate of B-cell
+outRateB = inRateB/1 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of naive B-cell
 
@@ -174,28 +199,27 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.00002/hour # Virus mutation rate
+mutatRateB = 0.0004/hour # Virus mutation rate
 
-cross_radius = float(0.01) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
-
-# time boundary and griding condition
-minT = float(0)
-maxT = float(10*12*28*day)
-totalPoint_T = int(6*10**3 + 1)
-gT = np.linspace(minT, maxT, totalPoint_T)
-spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
-gT = spacingT[0]
-dt = spacingT[1]
+cross_radius = float(20.0) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(9)
-
+maxX = float(19)
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
 gX = gridingX[0]
 dx = gridingX[1]
+# time boundary and griding condition
+minT = float(0)
+maxT = float(maxX*12*28*day)
+totalPoint_T = int(9*10**3 + 1)
+gT = np.linspace(minT, maxT, totalPoint_T)
+spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
+gT = spacingT[0]
+dt = spacingT[1]
+
 gV_array = np.zeros([totalPoint_X, totalPoint_T])
 gB_array = np.zeros([totalPoint_X, totalPoint_T])
 gM_array = np.zeros([totalPoint_X, totalPoint_T])
@@ -205,7 +229,7 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 
 # [viral population, starting time] ---first
 origin_virus = int(2)
-current_virus = int(6)
+current_virus = int(maxX - 3)
 infection_period = 12*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
@@ -229,7 +253,7 @@ print ('event_repeated = {:}'.format(event_repeated))
 min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+inRateG_OAS_boost = actRateBg*15 # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
@@ -296,7 +320,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[4]:
+# In[5]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
@@ -310,7 +334,7 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = (12, 9))
-for i in range(origin_virus, current_virus + 1):
+for i in range(origin_virus, current_virus - 1):
     detect_xn = current_virus + 2 - i
     if detect_xn == origin_virus:
         virus_label = '$ origin-virus $'
@@ -330,7 +354,7 @@ plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xlim([minX, maxX])
 plt.xticks(fontsize = AlvaFontSize)
 plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**0, 2**13])
+plt.ylim([2**4, 2**12])
 plt.yscale('log', basey = 2)
 plt.legend(loc = (1,0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -338,8 +362,8 @@ plt.show()
 
 # each frame
 numberingFig = numberingFig + 1
-for i in range(origin_virus, current_virus + 1):
-    plt.figure(numberingFig, figsize = (9,3))
+for i in range(origin_virus, current_virus):
+    plt.figure(numberingFig, figsize = (9, 3))
     detect_xn = current_virus + 2 - i
     if detect_xn == origin_virus:
         virus_label = '$ origin-virus $'

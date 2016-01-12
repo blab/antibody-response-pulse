@@ -194,13 +194,13 @@ if timeUnit == 'hour':
 elif timeUnit == 'day':
     day = float(1); hour = float(1)/24; 
     
-maxV = float(50) # max virus/micro-liter
+maxV = float(60) # max virus/micro-liter
 inRateV = 0.2/hour # in-rate of virus
 killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.01/hour # in-rate of B-cell
-outRateB = inRateB/1.5 # out-rate of B-cell
+inRateB = 0.0075/hour # in-rate of B-cell
+outRateB = inRateB # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of memory B-cell
 
