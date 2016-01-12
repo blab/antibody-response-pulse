@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[5]:
+# In[9]:
 
 '''
 author: Alvason Zhenhua Li
@@ -51,6 +51,8 @@ plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 # define the V-B-M-G partial differential equations
+# define the V-B-M-G partial differential equations
+'''define the V-B-M-G partial differential equations'''
 
 # inverted-monod equation
 def monodInvert(half_radius, i):
@@ -106,7 +108,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered + alva.event_OAS_press                         + alva.event_recoveredV + alva.event_OAS_pressV)                         *B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB + alva.event_OAS_slowV)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered                         + alva.event_OAS_boost)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -138,11 +140,11 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +(inRateG + alva.event_OAS_boost + alva.event_OAS_boostV)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
+    dG_dt_array[:] = +inRateG*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
-# In[6]:
+# In[10]:
 
 # setting parameter
 timeUnit = 'year'
@@ -157,13 +159,13 @@ elif timeUnit == 'year':
     day = float(1)/365
     hour = float(1)/24/365 
     
-maxV = float(50) # max virus/micro-liter
+maxV = float(60) # max virus/micro-liter
 inRateV = 0.2/hour # in-rate of virus
 killRateVm = 0.0003/hour # kill-rate of virus by antibody-IgM
 killRateVg = killRateVm # kill-rate of virus by antibody-IgG
 
-inRateB = 0.01/hour # in-rate of B-cell
-outRateB = inRateB/1.5 # out-rate of B-cell
+inRateB = 0.0075/hour # in-rate of B-cell
+outRateB = inRateB/1 # out-rate of B-cell
 actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of naive B-cell
 
@@ -175,13 +177,12 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.000033/hour # Virus mutation rate
+mutatRateB = 0.00004/hour # Virus mutation rate
 
-cross_radius = float(0.02) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
-
+cross_radius = float(0.4) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 # time boundary and griding condition
 minT = float(0)
-maxT = float(1.6*12*28*day)
+maxT = float(10*12*28*day)
 totalPoint_T = int(6*10**3 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
@@ -207,7 +208,7 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # [viral population, starting time] ---first
 origin_virus = int(2)
 current_virus = int(6)
-infection_period = 2*28*day
+infection_period = 12*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
 infection_starting_time = np.arange(int(maxX + 1))*infection_period 
@@ -243,8 +244,8 @@ print ('event_vaccine = {:}'.format(event_vaccine))
 min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = 1.5/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press = -0.00/hour # depress act-rate from memory B-cell for non-origin-virus
+inRateG_OAS_boost = actRateBg*15 # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press = 0.00/hour # depress act-rate from memory B-cell for non-origin-virus
 outRateB_OAS_slow = 0.0 # not applied in infection
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
@@ -260,9 +261,9 @@ event_infection_parameter = np.array([origin_virus,
 min_cell_v = 1 # minimum cell
 recovered_time_v = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered_v = actRateBg*9 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost_v = 3.0/hour # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
-actRateBg_OAS_press_v = -0.001/hour # depress act-rate from memory B-cell for non-origin-virus
-outRateB_OAS_slow_v = -outRateB/1.6 
+inRateG_OAS_boost_v = 0.0 # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_OAS_press_v = 0.00 # depress act-rate from memory B-cell for non-origin-virus
+outRateB_OAS_slow_v = 0.0 
 event_vaccination_parameter = np.array([origin_vaccine,
                                         current_vaccine, 
                                         min_cell_v, 
@@ -312,7 +313,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[7]:
+# In[11]:
 
 # Normalization stacked graph
 numberingFig = numberingFig + 1
@@ -335,7 +336,7 @@ plt.show()
 totalColor = current_virus - origin_virus + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 14*day
+sample_time = 60*day
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
@@ -363,7 +364,7 @@ plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xlim([minX, maxX])
 plt.xticks(fontsize = AlvaFontSize)
 plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**0, 2**12])
+plt.ylim([2**0, 2**14])
 plt.yscale('log', basey = 2)
 plt.legend(loc = (1,0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')

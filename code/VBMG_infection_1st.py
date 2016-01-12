@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[1]:
+# In[29]:
 
 '''
 author: Alvason Zhenhua Li
@@ -205,11 +205,11 @@ actRateBm = killRateVm # activation rate of naive B-cell
 actRateBg = killRateVg # activation rate of memory B-cell
 
 inRateM = 0.16/hour # in-rate of antibody-IgM from naive B-cell
-outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
+outRateM = inRateM  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
 inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/230 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
 
 # time boundary and griding condition
@@ -287,7 +287,7 @@ for i in range(1):
     plt.show()
 
 
-# In[2]:
+# In[30]:
 
 numberingFig = numberingFig + 1
 ymin = 2**0

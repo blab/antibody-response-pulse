@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[1]:
+# In[15]:
 
 '''
 author: Alvason Zhenhua Li
@@ -61,9 +61,12 @@ for i in range(total_list):
     plt.text(0, (total_list - float(i))/total_list
              , text_list[i].replace('\\\n', '')
              , fontsize = 1.2*AlvaFontSize)
-plt.savefig(save_figure, dpi = 100)
+plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
-# define the V-B-M-G partial differential equations
+
+
+# In[16]:
+
 '''define the V-B-M-G partial differential equations'''
 
 # inverted-monod equation
@@ -101,9 +104,7 @@ def dVdt_array(VBMGxt = [], *args):
     # there are n dSdt
     dV_dt_array = np.zeros(x_totalPoint)
     # each dSdt with the same equation form
-    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV) \
-                     - killRateVm*M[:]*V[:] \
-                     - killRateVg*V[:]*crossI_neighborSum_X(G, cross_radius, gX)[:]
+    dV_dt_array[:] = +inRateV*V[:]*(1 - V[:]/maxV)                      - killRateVm*M[:]*V[:]                      - killRateVg*V[:]*crossI_neighborSum_X(G, cross_radius, gX)[:]
     return(dV_dt_array)
 
 def dBdt_array(VBMGxt = [], *args):
@@ -122,13 +123,7 @@ def dBdt_array(VBMGxt = [], *args):
     rightX = np.roll(Bcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dB_dt_array[:] = +inRateB \
-                     + actRateBm*V[:]*B[:] \
-                     + (actRateBg \
-                        + alva.event_recovered \
-                        + alva.event_OAS_boost)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:] \
-                     - (outRateB)*B[:] \
-                     + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
+    dB_dt_array[:] = +inRateB                      + actRateBm*V[:]*B[:]                      + (actRateBg                         + alva.event_recovered                         + alva.event_OAS_boost)*B[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - (outRateB)*B[:]                      + mutatRateB*V[:]*(leftX[:] - 2*centerX[:] + rightX[:])/(dx**2)
     return(dB_dt_array)
 
 def dMdt_array(VBMGxt = [], *args):
@@ -160,16 +155,14 @@ def dGdt_array(VBMGxt = [], *args):
     rightX = np.roll(Gcopy[:], -1)
     leftX[0] = centerX[0]
     rightX[-1] = centerX[-1]
-    dG_dt_array[:] = +inRateG*B[:] \
-                     - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:] \
-                     - outRateG*G[:]
+    dG_dt_array[:] = (+inRateG + alva.event_OAS_press)*B[:]                      - consumeRateG*G[:]*crossI_neighborSum_X(V, cross_radius, gX)[:]                      - outRateG*G[:]
     return(dG_dt_array)
 
 
-# In[2]:
+# In[17]:
 
 # setting parameter
-timeUnit = 'day'
+timeUnit = 'year'
 if timeUnit == 'hour':
     hour = float(1)
     day = float(24)
@@ -196,25 +189,26 @@ outRateM = inRateM/1  # out-rate of antibody-IgM from naive B-cell
 consumeRateM = killRateVm # consume-rate of antibody-IgM by cleaning virus
 
 inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
-outRateG = outRateM/250 # out-rate of antibody-IgG from memory B-cell
+outRateG = outRateM/230 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 0.0004/hour # Virus mutation rate
+mutatRateB = 10**(-6)/hour # Virus mutation rate
 
-cross_radius = float(20.0) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(4) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # space boundary and griding condition
 minX = float(0)
-maxX = float(19)
+maxX = float(12)
 totalPoint_X = int(maxX - minX + 1)
 gX = np.linspace(minX, maxX, totalPoint_X)
 gridingX = np.linspace(minX, maxX, num = totalPoint_X, retstep = True)
 gX = gridingX[0]
 dx = gridingX[1]
 # time boundary and griding condition
+infection_period = 2*12*30*day
 minT = float(0)
-maxT = float(maxX*12*28*day)
-totalPoint_T = int(9*10**3 + 1)
+maxT = float(infection_period*maxX*12*30*day)
+totalPoint_T = int(2*10**4 + 1)
 gT = np.linspace(minT, maxT, totalPoint_T)
 spacingT = np.linspace(minT, maxT, num = totalPoint_T, retstep = True)
 gT = spacingT[0]
@@ -230,10 +224,9 @@ gG_array = np.zeros([totalPoint_X, totalPoint_T])
 # [viral population, starting time] ---first
 origin_virus = int(2)
 current_virus = int(maxX - 3)
-infection_period = 12*28*day
 viral_population = np.zeros(int(maxX + 1))
 viral_population[origin_virus:current_virus + 1] = 4
-infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27
+infection_starting_time = np.arange(int(maxX + 1))*infection_period - 27*day
 event_infect = np.zeros([int(maxX + 1), 2])
 event_infect[:, 0] = viral_population
 event_infect[:, 1] = infection_starting_time
@@ -252,14 +245,16 @@ print ('event_repeated = {:}'.format(event_repeated))
 #[origin-virus, current-virus, recovered-day, repeated-parameter, OAS+, OSA-]
 min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
-actRateBg_recovered = actRateBg*10 # activation rate of memory B-cell for repeated-infection (same virus)
-inRateG_OAS_boost = actRateBg*15 # boosting in-rate of antibody-IgG from memory B-cell for origin-virus
+actRateBg_recovered = actRateBg*10 # boosting up activation rate of memory B-cell for repeated-infection (same virus)
+actRateBg_OAS_boost = actRateBg*15 # boosting up activation rate of memory B-cell for origin-virus
+inRateG_OAS_press = inRateG*10 # depress in-rate of antibody-IgG from memory B-cell for current-virus
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
                                       recovered_time,
                                       actRateBg_recovered,
-                                      inRateG_OAS_boost])
+                                      actRateBg_OAS_boost,
+                                      inRateG_OAS_press])
 
 event_parameter = np.array([event_infection_parameter])
 
@@ -303,7 +298,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[3]:
+# In[18]:
 
 # Normalization stacked graph
 numberingFig = numberingFig + 1
@@ -320,13 +315,13 @@ plt.grid(True)
 plt.show()
 
 
-# In[5]:
+# In[24]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 60*day
+sample_time = 10*day
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
@@ -334,7 +329,7 @@ save_figure = os.path.join(dir_path, file_name + figure_name + file_suffix)
 
 numberingFig = numberingFig + 1
 plt.figure(numberingFig, figsize = (12, 9))
-for i in range(origin_virus, current_virus - 1):
+for i in range(origin_virus, current_virus + 1):
     detect_xn = current_virus + 2 - i
     if detect_xn == origin_virus:
         virus_label = '$ origin-virus $'
@@ -342,7 +337,7 @@ for i in range(origin_virus, current_virus - 1):
         virus_label = '$ current-virus $' 
     else: virus_label = '$ {:}th-virus $'.format(detect_xn - origin_virus + 1)
     detect_time = int(totalPoint_T/(maxT - minT)*(detect_xn*infection_period + sample_time))
-    plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 20
+    plt.plot(gX, gM[:, detect_time] + gG[:, detect_time], marker = 'o', markersize = 10
              , color = AlvaColor[detect_xn - origin_virus], label = virus_label)
     plt.fill_between(gX, gM[:, detect_time] + gG[:, detect_time], facecolor = AlvaColor[detect_xn - origin_virus]
                      , alpha = 0.5)
@@ -354,7 +349,7 @@ plt.ylabel(r'$ Neutralization \ \ titer $', fontsize = AlvaFontSize)
 plt.xlim([minX, maxX])
 plt.xticks(fontsize = AlvaFontSize)
 plt.yticks(fontsize = AlvaFontSize) 
-plt.ylim([2**4, 2**12])
+plt.ylim([2**4, 2**14])
 plt.yscale('log', basey = 2)
 plt.legend(loc = (1,0), fontsize = AlvaFontSize)
 plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
@@ -362,7 +357,7 @@ plt.show()
 
 # each frame
 numberingFig = numberingFig + 1
-for i in range(origin_virus, current_virus):
+for i in range(origin_virus, current_virus + 1):
     plt.figure(numberingFig, figsize = (9, 3))
     detect_xn = current_virus + 2 - i
     if detect_xn == origin_virus:

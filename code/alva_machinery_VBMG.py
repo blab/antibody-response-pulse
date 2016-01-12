@@ -22,6 +22,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                       , minT_In, maxT_In, totalPoint_T, event_table):
     global event_recovered; event_recovered = 0.0
     global event_OAS_boost; event_OAS_boost = 0.0
+    global event_OAS_press; event_OAS_press = 0.0
     # primary size of pde equations
     outWay = pde_array.shape[0]
     # initialize the whole memory-space for output and input
@@ -73,6 +74,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 ## infection
                 event_recovered = 0.0
                 event_OAS_boost = 0.0
+                event_OAS_press = 0.0
                 # cutoff --- set virus = 0 if viral population < minCell  
                 if gOutIn_array[eqV, xn, tn] < minCell:
                     gOutIn_array[eqV, xn, tn] = 0.0 
@@ -83,9 +85,12 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 if event_infect[xn, numberIn] > minCell and tn == int(event_repeat[xn, timeIn]*tn_unit):
                     gOutIn_array[eqV, xn, tn] = event_repeat[xn, numberIn] 
                     event_recovered = event_parameter[0, 4]
-                # OAS+immunity --- # boosting origin-virus (memory B-cell from origin-virus is still existing) 
+                # OAS+ --- # boosting Bcell-activation-rate from origin-virus  
                 if event_infect[xn, numberIn] > minCell and event_infect[xn + 1, numberIn] > minCell                                      and tn > int(event_infect[xn + 1, timeIn]*tn_unit):
-                    event_OAS_boost = event_parameter[0, 5] # boosting in-rate of antibody-IgG from origin-virus
+                    event_OAS_boost = event_parameter[0, 5] 
+                # OAS- --- # depress IgG-in-rate from current-virus
+                if event_infect[xn, numberIn] > minCell and event_infect[xn - 1, numberIn] > minCell                                      and tn > int(event_infect[xn, timeIn]*tn_unit):
+                    event_OAS_press = event_parameter[0, 6] # pressing in-rate of antibody-IgG from origin-virus
                 ###
                 dydt1_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt1_array[:, :]*dt/2 # update output
@@ -97,6 +102,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 ## infection
                 event_recovered = 0.0
                 event_OAS_boost = 0.0
+                event_OAS_press = 0.0
                 # cutoff --- set virus = 0 if viral population < minCell  
                 if gOutIn_array[eqV, xn, tn] < minCell:
                     gOutIn_array[eqV, xn, tn] = 0.0 
@@ -107,9 +113,12 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 if event_infect[xn, numberIn] > minCell and tn == int(event_repeat[xn, timeIn]*tn_unit):
                     gOutIn_array[eqV, xn, tn] = event_repeat[xn, numberIn] 
                     event_recovered = event_parameter[0, 4]
-                # OAS+immunity --- # boosting origin-virus (memory B-cell from origin-virus is still existing) 
+                # OAS+ --- # boosting Bcell-activation-rate from origin-virus  
                 if event_infect[xn, numberIn] > minCell and event_infect[xn + 1, numberIn] > minCell                                      and tn > int(event_infect[xn + 1, timeIn]*tn_unit):
-                    event_OAS_boost = event_parameter[0, 5] # boosting in-rate of antibody-IgG from origin-virus
+                    event_OAS_boost = event_parameter[0, 5] 
+                # OAS- --- # depress IgG-in-rate from current-virus
+                if event_infect[xn, numberIn] > minCell and event_infect[xn - 1, numberIn] > minCell                                      and tn > int(event_infect[xn, timeIn]*tn_unit):
+                    event_OAS_press = event_parameter[0, 6] # pressing in-rate of antibody-IgG from origin-virus
                 ###
                 dydt2_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt2_array[:, :]*dt/2 # update output
@@ -121,6 +130,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 ## infection
                 event_recovered = 0.0
                 event_OAS_boost = 0.0
+                event_OAS_press = 0.0
                 # cutoff --- set virus = 0 if viral population < minCell  
                 if gOutIn_array[eqV, xn, tn] < minCell:
                     gOutIn_array[eqV, xn, tn] = 0.0 
@@ -131,9 +141,12 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 if event_infect[xn, numberIn] > minCell and tn == int(event_repeat[xn, timeIn]*tn_unit):
                     gOutIn_array[eqV, xn, tn] = event_repeat[xn, numberIn] 
                     event_recovered = event_parameter[0, 4]
-                # OAS+immunity --- # boosting origin-virus (memory B-cell from origin-virus is still existing) 
+                # OAS+ --- # boosting Bcell-activation-rate from origin-virus  
                 if event_infect[xn, numberIn] > minCell and event_infect[xn + 1, numberIn] > minCell                                      and tn > int(event_infect[xn + 1, timeIn]*tn_unit):
-                    event_OAS_boost = event_parameter[0, 5] # boosting in-rate of antibody-IgG from origin-virus
+                    event_OAS_boost = event_parameter[0, 5] 
+                # OAS- --- # depress IgG-in-rate from current-virus
+                if event_infect[xn, numberIn] > minCell and event_infect[xn - 1, numberIn] > minCell                                      and tn > int(event_infect[xn, timeIn]*tn_unit):
+                    event_OAS_press = event_parameter[0, 6] # pressing in-rate of antibody-IgG from origin-virus
                 ###
                 dydt3_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio   
         gOutIn_array[:-inWay, :, tn] = currentOut_Value[:, :] + dydt3_array[:, :]*dt # update output
@@ -145,6 +158,7 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 ## infection
                 event_recovered = 0.0
                 event_OAS_boost = 0.0
+                event_OAS_press = 0.0
                 # cutoff --- set virus = 0 if viral population < minCell  
                 if gOutIn_array[eqV, xn, tn] < minCell:
                     gOutIn_array[eqV, xn, tn] = 0.0 
@@ -155,9 +169,12 @@ def AlvaRungeKutta4XT(pde_array, initial_Out, minX_In, maxX_In, totalPoint_X
                 if event_infect[xn, numberIn] > minCell and tn == int(event_repeat[xn, timeIn]*tn_unit):
                     gOutIn_array[eqV, xn, tn] = event_repeat[xn, numberIn] 
                     event_recovered = event_parameter[0, 4]
-                # OAS+immunity --- # boosting origin-virus (memory B-cell from origin-virus is still existing) 
+                # OAS+ --- # boosting Bcell-activation-rate from origin-virus  
                 if event_infect[xn, numberIn] > minCell and event_infect[xn + 1, numberIn] > minCell                                      and tn > int(event_infect[xn + 1, timeIn]*tn_unit):
-                    event_OAS_boost = event_parameter[0, 5] # boosting in-rate of antibody-IgG from origin-virus
+                    event_OAS_boost = event_parameter[0, 5] 
+                # OAS- --- # depress IgG-in-rate from current-virus
+                if event_infect[xn, numberIn] > minCell and event_infect[xn - 1, numberIn] > minCell                                      and tn > int(event_infect[xn, timeIn]*tn_unit):
+                    event_OAS_press = event_parameter[0, 6] # pressing in-rate of antibody-IgG from origin-virus
                 ###
                 dydt4_array[i, xn] = pde_array[i](gOutIn_array[:, :, tn])[xn] # computing ratio 
         # solid step (update the next output) by accumulate all the try-steps with proper adjustment
