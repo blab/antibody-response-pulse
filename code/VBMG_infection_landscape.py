@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[15]:
+# In[13]:
 
 '''
 author: Alvason Zhenhua Li
@@ -65,7 +65,7 @@ plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 
-# In[16]:
+# In[14]:
 
 '''define the V-B-M-G partial differential equations'''
 
@@ -159,7 +159,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[17]:
+# In[15]:
 
 # setting parameter
 timeUnit = 'year'
@@ -194,7 +194,7 @@ consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
 mutatRateB = 10**(-6)/hour # Virus mutation rate
 
-cross_radius = float(4) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(1) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # space boundary and griding condition
 minX = float(0)
@@ -247,7 +247,7 @@ min_cell = 1 # minimum cell
 recovered_time = 14*day # recovered time of 1st-time infection 
 actRateBg_recovered = actRateBg*10 # boosting up activation rate of memory B-cell for repeated-infection (same virus)
 actRateBg_OAS_boost = actRateBg*15 # boosting up activation rate of memory B-cell for origin-virus
-inRateG_OAS_press = inRateG*10 # depress in-rate of antibody-IgG from memory B-cell for current-virus
+inRateG_OAS_press = inRateG*15 # depress in-rate of antibody-IgG from memory B-cell for current-virus
 event_infection_parameter = np.array([origin_virus,
                                       current_virus, 
                                       min_cell, 
@@ -298,7 +298,29 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[18]:
+# In[16]:
+
+numberingFig = numberingFig + 1;
+figure = plt.figure(numberingFig, figsize = (14, 7))
+plot1 = figure.add_subplot(1, 2, 2)
+#colorPlot = plot1.contourf(gT, gX, gI, levels = np.arange(0, 0.12, 0.001))
+colorPlot = plot1.pcolor(gT, gX, (gM + gG))
+plt.title(r'$ Antibody \ Response $', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ ({:})$'.format(timeUnit), fontsize = AlvaFontSize);
+plt.ylabel(r'$ discrete \ space \ (strain) $', fontsize = AlvaFontSize)
+plt.colorbar(colorPlot)
+
+plot2 = figure.add_subplot(1, 2, 1)
+plot2.plot(gT, ((gM + gG).T + np.arange(totalPoint_X)*1000))
+plt.title(r'$ Antibody \ Response $', fontsize = AlvaFontSize)
+plt.xlabel(r'$time \ ({:})$'.format(timeUnit), fontsize = AlvaFontSize)
+plt.ylabel(r'$ discrete \ space \ (strain) $', fontsize = AlvaFontSize)
+
+figure.tight_layout()
+plt.show()
+
+
+# In[17]:
 
 # Normalization stacked graph
 numberingFig = numberingFig + 1
@@ -315,13 +337,13 @@ plt.grid(True)
 plt.show()
 
 
-# In[24]:
+# In[18]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
 AlvaColor = [plt.get_cmap('rainbow')(float(i)/(totalColor)) for i in range(1, totalColor + 1)]
 
-sample_time = 10*day
+sample_time = 3*day
 # plotting
 figure_name = '-landscape'
 figure_suffix = '.png'
