@@ -7,7 +7,7 @@
 # ### B-cells evolution --- cross-reactive antibody response after influenza virus infection or vaccination
 # ### Adaptive immune response for sequential infection
 
-# In[13]:
+# In[1]:
 
 '''
 author: Alvason Zhenhua Li
@@ -65,7 +65,7 @@ plt.savefig(save_figure, dpi = 100, bbox_inches='tight')
 plt.show()
 
 
-# In[14]:
+# In[2]:
 
 '''define the V-B-M-G partial differential equations'''
 
@@ -159,7 +159,7 @@ def dGdt_array(VBMGxt = [], *args):
     return(dG_dt_array)
 
 
-# In[15]:
+# In[3]:
 
 # setting parameter
 timeUnit = 'year'
@@ -192,9 +192,9 @@ inRateG = inRateM/10 # in-rate of antibody-IgG from memory B-cell
 outRateG = outRateM/230 # out-rate of antibody-IgG from memory B-cell
 consumeRateG = killRateVg  # consume-rate of antibody-IgG by cleaning virus
     
-mutatRateB = 10**(-6)/hour # Virus mutation rate
+mutatRateB = 10**(-5)/hour # Virus mutation rate
 
-cross_radius = float(1) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
+cross_radius = float(0.5) # radius of cross-immunity (the distance of half-of-value in the Monod equation)
 
 # space boundary and griding condition
 minX = float(0)
@@ -298,7 +298,7 @@ for i in range(totalPoint_X):
     plt.show()
 
 
-# In[16]:
+# In[4]:
 
 numberingFig = numberingFig + 1;
 figure = plt.figure(numberingFig, figsize = (14, 7))
@@ -320,7 +320,7 @@ figure.tight_layout()
 plt.show()
 
 
-# In[17]:
+# In[5]:
 
 # Normalization stacked graph
 numberingFig = numberingFig + 1
@@ -337,7 +337,7 @@ plt.grid(True)
 plt.show()
 
 
-# In[18]:
+# In[6]:
 
 # expected peak of the antibody response
 totalColor = current_virus - origin_virus + 1 
